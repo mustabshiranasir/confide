@@ -6,14 +6,14 @@ import {
   TouchableOpacity,
   Animated,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 
 type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: undefined;
+  JournalBook: { page: number };
   NewEntry: undefined;
 };
 
@@ -37,7 +37,9 @@ const SAMPLE_ENTRIES = [
 
 export default function JournalBookScreen() {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const [currentPage, setCurrentPage] = useState(0);
+  const route = useRoute<RouteProp<RootStackParamList, 'JournalBook'>>();
+  const startPage = route.params?.page ?? 0;
+  const [currentPage, setCurrentPage] = useState(startPage);
   const [fadeAnim] = useState(new Animated.Value(1));
 
   const entry = SAMPLE_ENTRIES[currentPage];
@@ -163,7 +165,6 @@ const styles = StyleSheet.create({
   dateLine: {
     borderBottomWidth: 1,
     borderBottomColor: colors.accent,
-    borderBottomStyle: 'solid',
     paddingBottom: 8,
     marginBottom: 16,
   },

@@ -8,7 +8,7 @@ import { fonts } from '../theme/fonts';
 
 export type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: undefined;
+  JournalBook: { page: number };
   NewEntry: undefined;
 };
 
@@ -48,7 +48,7 @@ export default function StackNavigator() {
         options={{
           title: 'My Diary',
           headerTitleAlign: 'center',
-          headerBackTitleVisible: false,
+          headerBackButtonDisplayMode: 'minimal',
         }}
       />
       <Stack.Screen
@@ -57,7 +57,7 @@ export default function StackNavigator() {
         options={{
           title: 'New Entry',
           headerTitleAlign: 'center',
-          headerBackTitleVisible: false,
+          headerBackButtonDisplayMode: 'minimal',
           presentation: 'modal',
         }}
       />
