@@ -8,37 +8,20 @@
     "userInterfaceStyle": "automatic",
     "splash": {
       "backgroundColor": "#FBF6EE",
-      "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain"
     },
     "ios": {
-      "supportsTablet": true,
-      "icon": "./assets/expo.icon"
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#FBF6EE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png"
+        "backgroundColor": "#FBF6EE"
       }
     },
     "web": {
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "bundler": "metro"
     },
-    "plugins": [
-      [
-        "expo-font",
-        {
-          "fonts": []
-        }
-      ],
-      [
-        "expo-splash-screen",
-        {
-          "backgroundColor": "#FBF6EE",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
-        }
-      ]
-    ]
+    "plugins": []
   }
 }
