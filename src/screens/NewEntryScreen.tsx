@@ -11,27 +11,72 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import Svg, { Circle, Path, Rect, G } from 'react-native-svg';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
-import JournalPage from '../components/JournalPage';
-import { PaperStyle } from '../components/JournalPage';
+import JournalPage, { PaperStyle, getPaperInk } from '../components/JournalPage';
 import BackgroundPicker from '../components/BackgroundPicker';
+import StickerPicker from '../components/Sticker/StickerPicker';
+import StickerCanvas from '../components/Sticker/StickerCanvas';
+import StickerToolbar from '../components/Sticker/StickerToolbar';
+import { PlacedSticker, Sticker } from '../types/sticker';
+import { useStickerHistory } from '../hooks/useStickerHistory';
+import { saveEntry } from '../data/journalStore';
 
 type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: { page: number; newEntry?: { text: string; date: string } };
+  JournalBook: { page: number; newEntry?: { id: string; text: string; date: string; stickers?: PlacedSticker[]; background?: PaperStyle } };
   NewEntry: undefined;
 };
 
 const INITIAL_HEIGHT = 280;
+const OPACITY_STEP = 0.2;
+
+const STICKER_PETALS = [
+  [12, 8.9],
+  [9.05, 11.04],
+  [10.18, 14.51],
+  [13.82, 14.51],
+  [14.95, 11.04],
+];
+
+function StickerIcon() {
+  return (
+    <Svg width={24} height={24} viewBox="0 0 24 24">
+      <G transform="rotate(-8 12 12)">
+        <Rect x="4" y="4" width="16" height="16" rx="3.5" fill={colors.sage} />
+        <Path d="M16.4,4 L20,4 L20,7.6 Z" fill="#A3B495" />
+        <Path d="M16.4,4 L20,7.6" stroke={colors.base} strokeWidth="1" />
+        {STICKER_PETALS.map(([x, y]) => (
+          <Circle key={`${x}-${y}`} cx={x} cy={y} r="2.6" fill={colors.accent} />
+        ))}
+        <Circle cx="12" cy="12" r="2.4" fill={colors.white} />
+        <Circle cx="11.3" cy="11.3" r="0.5" fill={colors.text} />
+        <Circle cx="12.7" cy="11.3" r="0.5" fill={colors.text} />
+        <Path
+          d="M10.8,13.2 Q12,14.4 13.2,13.2"
+          stroke={colors.text}
+          strokeWidth="0.6"
+          strokeLinecap="round"
+          fill="none"
+        />
+      </G>
+    </Svg>
+  );
+}
 
 function PaletteIcon() {
   return (
-    <View style={iconStyles.paletteOuter}>
-      <View style={[iconStyles.paletteDot, { top: 4, left: 5 }]} />
-      <View style={[iconStyles.paletteDot, { top: 4, left: 18 }]} />
-      <View style={[iconStyles.paletteDot, { top: 15, left: 11 }]} />
-    </View>
+    <Svg width={24} height={24} viewBox="0 0 24 24">
+      <Path
+        d="M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9c0.83,0,1.5-0.67,1.5-1.5 0-0.39-0.15-0.74-0.39-1.01C12.87,18.22,12.73,17.87,12.73,17.49c0-0.83,0.67-1.5,1.5-1.5h2.76c1.66,0,3.01-1.34,3.01-3.01C20,7.03,16.42,3,12,3z"
+        fill={colors.text}
+      />
+      <Circle cx="6.5" cy="13.5" r="1.4" fill="#E05D5D" />
+      <Circle cx="10.5" cy="10.5" r="1.4" fill="#E8B44A" />
+      <Circle cx="15.5" cy="10.5" r="1.4" fill="#5B8DB8" />
+      <Circle cx="6.5" cy="8.5" r="1.4" fill="#8FAE7B" />
+    </Svg>
   );
 }
 
@@ -43,19 +88,60 @@ function CheckIcon() {
   );
 }
 
+function UndoIcon({ dimmed = false }: { dimmed?: boolean }) {
+  return (
+    <Svg width={24} height={24} viewBox="0 0 24 24" opacity={dimmed ? 0.35 : 1}>
+      <Circle cx="12" cy="12" r="11" fill={colors.overlay} />
+      <Path
+        d="M12.5,8c-2.65,0-5.05,0.99-6.9,2.6L2,7v9h9l-3.62-3.62c1.39-1.16,3.16-1.88,5.12-1.88 3.54,0,6.55,2.31,7.6,5.5l2.37-0.78C21.08,11.03,17.15,8,12.5,8z"
+        fill={colors.text}
+      />
+    </Svg>
+  );
+}
+
+function RedoIcon({ dimmed = false }: { dimmed?: boolean }) {
+  return (
+    <Svg width={24} height={24} viewBox="0 0 24 24" opacity={dimmed ? 0.35 : 1}>
+      <Circle cx="12" cy="12" r="11" fill={colors.overlay} />
+      <Path
+        d="M18.4,10.6C16.55,8.99,14.15,8,11.5,8c-4.65,0-8.58,3.03-9.96,7.22L3.9,16c1.05-3.19,4.05-5.5,7.6-5.5,1.95,0,3.73,0.72,5.12,1.88L13,16h9V7L18.4,10.6z"
+        fill={colors.text}
+      />
+    </Svg>
+  );
+}
+
 export default function NewEntryScreen() {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [text, setText] = useState('');
   const [contentHeight, setContentHeight] = useState(INITIAL_HEIGHT);
   const [isBgPickerOpen, setIsBgPickerOpen] = useState(false);
-  const [paperStyle, setPaperStyle] = useState<PaperStyle>('lined');
+  const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false);
+  const [paperStyle, setPaperStyle] = useState<PaperStyle>('custom');
+  const [activeStickerId, setActiveStickerId] = useState<string | null>(null);
   const textRef = useRef<TextInput>(null);
+
+  const {
+    stickers: placedStickers,
+    setStickers,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+  } = useStickerHistory([]);
 
   const today = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
+
+  const ink = getPaperInk(paperStyle);
+  const placeholderInk = ink === colors.text ? 'rgba(74, 74, 74, 0.25)' : `${ink}66`;
+
+  const activeSticker = placedStickers.find((s) => s.id === activeStickerId) ?? null;
+  const activeIndex = activeSticker ? placedStickers.indexOf(activeSticker) : -1;
 
   const handleContentSizeChange = useCallback(
     (e: { nativeEvent: { layout: { height: number } } }) => {
@@ -66,11 +152,79 @@ export default function NewEntryScreen() {
 
   const handleSave = () => {
     const trimmed = text.trim();
-    if (!trimmed) return;
+    if (!trimmed && placedStickers.length === 0) return;
+    const id = `entry-${Date.now()}`;
+    const entry = { id, text: trimmed, date: today, stickers: placedStickers, background: paperStyle };
+    saveEntry(entry);
     navigation.navigate('JournalBook', {
       page: 0,
-      newEntry: { text: trimmed, date: today },
+      newEntry: entry,
     });
+  };
+
+  const handleSelectSticker = (sticker: Sticker) => {
+    const newSticker: PlacedSticker = {
+      id: `sticker-${Date.now()}`,
+      stickerId: sticker.id,
+      x: 90,
+      y: 120,
+      scale: 1,
+      rotation: 0,
+      opacity: 1,
+    };
+    setStickers((prev) => [...prev, newSticker]);
+    setActiveStickerId(newSticker.id);
+    setIsStickerPickerOpen(false);
+  };
+
+  const handleUpdateSticker = (id: string, updates: Partial<PlacedSticker>) => {
+    setStickers((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, ...updates } : s))
+    );
+  };
+
+  const handleDeleteSticker = (id: string) => {
+    setStickers((prev) => prev.filter((s) => s.id !== id));
+    if (activeStickerId === id) setActiveStickerId(null);
+  };
+
+  const handleDuplicate = () => {
+    if (!activeSticker) return;
+    const copy: PlacedSticker = {
+      ...activeSticker,
+      id: `sticker-${Date.now()}`,
+      x: activeSticker.x + 24,
+      y: activeSticker.y + 24,
+    };
+    setStickers((prev) => [...prev, copy]);
+    setActiveStickerId(copy.id);
+  };
+
+  const handleBringToFront = () => {
+    if (activeIndex < 0) return;
+    setStickers((prev) => {
+      const item = prev[activeIndex];
+      return [...prev.filter((_, i) => i !== activeIndex), item];
+    });
+  };
+
+  const handleSendToBack = () => {
+    if (activeIndex < 0) return;
+    setStickers((prev) => {
+      const item = prev[activeIndex];
+      return [item, ...prev.filter((_, i) => i !== activeIndex)];
+    });
+  };
+
+  const handleOpacityChange = (delta: number) => {
+    if (!activeStickerId) return;
+    setStickers((prev) =>
+      prev.map((s) =>
+        s.id === activeStickerId
+          ? { ...s, opacity: Math.min(1, Math.max(0.2, Math.round((s.opacity + delta) * 10) / 10)) }
+          : s
+      )
+    );
   };
 
   return (
@@ -92,9 +246,9 @@ export default function NewEntryScreen() {
 
           <TextInput
             ref={textRef}
-            style={[styles.textInput, { minHeight: contentHeight }]}
+            style={[styles.textInput, { minHeight: contentHeight, color: ink }]}
             placeholder="Start writing..."
-            placeholderTextColor="rgba(74, 74, 74, 0.25)"
+            placeholderTextColor={placeholderInk}
             multiline
             textAlignVertical="top"
             value={text}
@@ -105,31 +259,96 @@ export default function NewEntryScreen() {
             selectionColor={colors.accent}
             scrollEnabled={false}
           />
+
+          <StickerCanvas
+            stickers={placedStickers}
+            activeStickerId={activeStickerId}
+            onActivate={setActiveStickerId}
+            onUpdate={handleUpdateSticker}
+            onDelete={handleDeleteSticker}
+          />
         </JournalPage>
       </ScrollView>
+
+      {activeSticker && !isStickerPickerOpen && (
+        <StickerToolbar
+          onDuplicate={handleDuplicate}
+          onBringToFront={handleBringToFront}
+          onSendToBack={handleSendToBack}
+          onOpacityDown={() => handleOpacityChange(-OPACITY_STEP)}
+          onOpacityUp={() => handleOpacityChange(OPACITY_STEP)}
+          onDelete={() => handleDeleteSticker(activeSticker.id)}
+          onClose={() => setActiveStickerId(null)}
+          opacity={activeSticker.opacity}
+          canBringToFront={activeIndex < placedStickers.length - 1}
+          canSendToBack={activeIndex > 0}
+        />
+      )}
 
       <View style={styles.toolbar}>
         <TouchableOpacity
           style={styles.toolButton}
           activeOpacity={0.6}
-          onPress={() => setIsBgPickerOpen((prev) => !prev)}
+          disabled={!canUndo}
+          onPress={undo}
+        >
+          <UndoIcon dimmed={!canUndo} />
+          <Text style={[styles.toolLabel, !canUndo && styles.toolLabelDisabled]}>Undo</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.toolButton}
+          activeOpacity={0.6}
+          disabled={!canRedo}
+          onPress={redo}
+        >
+          <RedoIcon dimmed={!canRedo} />
+          <Text style={[styles.toolLabel, !canRedo && styles.toolLabelDisabled]}>Redo</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.toolButton}
+          activeOpacity={0.6}
+          onPress={() => {
+            setIsBgPickerOpen(false);
+            setIsStickerPickerOpen(true);
+          }}
+        >
+          <StickerIcon />
+          <Text style={styles.toolLabel}>Stickers</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.toolButton}
+          activeOpacity={0.6}
+          onPress={() => {
+            setIsStickerPickerOpen(false);
+            setIsBgPickerOpen((prev) => !prev);
+          }}
         >
           <PaletteIcon />
           <Text style={styles.toolLabel}>Background</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.saveButton, !text.trim() && styles.saveButtonDisabled]}
+          style={[styles.saveButton, (!text.trim() && placedStickers.length === 0) && styles.saveButtonDisabled]}
           activeOpacity={0.7}
           onPress={handleSave}
-          disabled={!text.trim()}
+          disabled={!text.trim() && placedStickers.length === 0}
         >
           <CheckIcon />
-          <Text style={[styles.saveLabel, !text.trim() && styles.saveLabelDisabled]}>
+          <Text style={[styles.saveLabel, (!text.trim() && placedStickers.length === 0) && styles.saveLabelDisabled]}>
             Save
           </Text>
         </TouchableOpacity>
       </View>
+
+      {isStickerPickerOpen && (
+        <StickerPicker
+          onSelect={handleSelectSticker}
+          onClose={() => setIsStickerPickerOpen(false)}
+        />
+      )}
 
       <BackgroundPicker
         isVisible={isBgPickerOpen}
@@ -142,12 +361,6 @@ export default function NewEntryScreen() {
 }
 
 const iconStyles = StyleSheet.create({
-  paletteOuter: {
-    width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, borderColor: colors.text, position: 'relative',
-  },
-  paletteDot: {
-    position: 'absolute', width: 4, height: 4, borderRadius: 2, backgroundColor: colors.text,
-  },
   checkOuter: {
     width: 22, height: 22, borderRadius: 11, backgroundColor: colors.sage,
     justifyContent: 'center', alignItems: 'center',
@@ -169,7 +382,7 @@ const styles = StyleSheet.create({
   dateLabel: { fontFamily: fonts.handwritten, fontSize: 22, color: colors.sage, marginBottom: 4 },
   dateUnderline: { width: 80, height: 1, backgroundColor: colors.accent, marginBottom: 12 },
   textInput: {
-    fontFamily: fonts.handwritten, fontSize: 22, color: colors.text,
+    fontFamily: fonts.handwritten, fontSize: 22,
     lineHeight: 34, padding: 0, borderWidth: 0,
   },
   toolbar: {
@@ -180,6 +393,7 @@ const styles = StyleSheet.create({
   },
   toolButton: { alignItems: 'center', gap: 4, paddingVertical: 6, paddingHorizontal: 12 },
   toolLabel: { fontFamily: fonts.ui, fontSize: 10, color: colors.textLight, letterSpacing: 0.5 },
+  toolLabelDisabled: { opacity: 0.35 },
   saveButton: { alignItems: 'center', gap: 4, paddingVertical: 6, paddingHorizontal: 12 },
   saveButtonDisabled: { opacity: 0.35 },
   saveLabel: { fontFamily: fonts.uiSemiBold, fontSize: 10, color: colors.sage, letterSpacing: 0.5 },

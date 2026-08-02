@@ -19,7 +19,6 @@ type RootStackParamList = {
 
 const LEATHER_BASE = '#6B3A2A';
 const LEATHER_LIGHT = '#7D4835';
-const LEATHER_DARK = '#4E2A1E';
 const LEATHER_HIGHLIGHT = '#8B5E4B';
 const SPINE_COLOR = '#5C3222';
 const PAGE_EDGE = '#F5F0E8';

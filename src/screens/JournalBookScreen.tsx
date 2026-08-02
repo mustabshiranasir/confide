@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Dimensions,
   FlatList,
   ListRenderItemInfo,
+  Image,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -20,11 +21,14 @@ import Animated, {
 } from 'react-native-reanimated';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
-import JournalPage from '../components/JournalPage';
+import JournalPage, { getPaperInk, PaperStyle } from '../components/JournalPage';
+import { PlacedSticker } from '../types/sticker';
+import { getStickerSource } from '../data/stickers';
+import { loadEntries, StoredEntry } from '../data/journalStore';
 
 type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: { page: number; newEntry?: { text: string; date: string } };
+  JournalBook: { page: number; newEntry?: { id: string; text: string; date: string; stickers?: PlacedSticker[]; background?: PaperStyle } };
   NewEntry: undefined;
 };
 
@@ -32,6 +36,8 @@ interface Entry {
   id: string;
   date: string;
   text: string;
+  stickers?: PlacedSticker[];
+  background?: PaperStyle;
 }
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -105,11 +111,37 @@ function PageFlipItem({
   return (
     <View style={styles.pageWrapper}>
       <Animated.View style={[styles.pageContainer, animatedStyle]}>
-        <JournalPage background="lined" style={styles.diaryPage}>
+        <JournalPage background={item.background ?? 'custom'} style={styles.diaryPage}>
           <View style={styles.tapeStrip} />
           <Text style={styles.dateText}>{item.date}</Text>
           <View style={styles.dateUnderline} />
-          <Text style={styles.entryText}>{item.text}</Text>
+          <Text style={[styles.entryText, { color: getPaperInk(item.background ?? 'custom') }]}>{item.text}</Text>
+
+          {item.stickers?.map((sticker) => {
+            const source = getStickerSource(sticker.stickerId);
+            if (!source) return null;
+            return (
+              <View
+                key={sticker.id}
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  width: 80,
+                  height: 80,
+                  opacity: sticker.opacity,
+                  transform: [
+                    { translateX: sticker.x },
+                    { translateY: sticker.y },
+                    { scale: sticker.scale },
+                    { rotateZ: `${sticker.rotation}rad` },
+                  ],
+                }}
+              >
+                <Image source={source} style={{ width: 80, height: 80 }} resizeMode="contain" />
+              </View>
+            );
+          })}
         </JournalPage>
       </Animated.View>
     </View>
@@ -122,19 +154,38 @@ export default function JournalBookScreen() {
   const newEntryParam = route.params?.newEntry;
   const startPage = route.params?.page ?? 0;
 
+  const [persisted, setPersisted] = useState<StoredEntry[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    loadEntries().then((entries) => {
+      if (mounted) {
+        setPersisted(entries);
+        setLoaded(true);
+      }
+    });
+    return () => { mounted = false; };
+  }, []);
+
   const entries: Entry[] = React.useMemo(() => {
-    if (newEntryParam) {
-      return [
-        {
-          id: `new-${Date.now()}`,
-          date: newEntryParam.date,
-          text: newEntryParam.text,
-        },
-        ...SAMPLE_ENTRIES,
-      ];
-    }
-    return SAMPLE_ENTRIES;
-  }, [newEntryParam]);
+    const base = loaded ? persisted : [];
+    const mapEntry = (e: StoredEntry): Entry => ({
+      id: e.id,
+      date: e.date,
+      text: e.text,
+      stickers: e.stickers,
+      background: e.background,
+    });
+    const all = newEntryParam ? [mapEntry(newEntryParam), ...base] : [...base];
+    const seen = new Set<string>();
+    const deduped = all.filter((e) => {
+      if (seen.has(e.id)) return false;
+      seen.add(e.id);
+      return true;
+    });
+    return [...deduped, ...SAMPLE_ENTRIES];
+  }, [loaded, persisted, newEntryParam]);
 
   const [currentPage, setCurrentPage] = useState(startPage);
   const scrollX = useSharedValue(startPage * PAGE_W);

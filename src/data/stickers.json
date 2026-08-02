@@ -807,7 +807,398 @@
     {
       "name": "kawaii",
       "label": "Kawaii",
-      "stickers": []
+      "stickers": [
+        {
+          "id": "kawaii_001_001",
+          "name": "Kawaii 1-01",
+          "category": "kawaii",
+          "file": "kawaii_001_001.png",
+          "tags": [
+            "kawaii",
+            "pack1"
+          ]
+        },
+        {
+          "id": "kawaii_001_002",
+          "name": "Kawaii 1-02",
+          "category": "kawaii",
+          "file": "kawaii_001_002.png",
+          "tags": [
+            "kawaii",
+            "pack1"
+          ]
+        },
+        {
+          "id": "kawaii_001_003",
+          "name": "Kawaii 1-03",
+          "category": "kawaii",
+          "file": "kawaii_001_003.png",
+          "tags": [
+            "kawaii",
+            "pack1"
+          ]
+        },
+        {
+          "id": "kawaii_001_004",
+          "name": "Kawaii 1-04",
+          "category": "kawaii",
+          "file": "kawaii_001_004.png",
+          "tags": [
+            "kawaii",
+            "pack1"
+          ]
+        },
+        {
+          "id": "kawaii_001_005",
+          "name": "Kawaii 1-05",
+          "category": "kawaii",
+          "file": "kawaii_001_005.png",
+          "tags": [
+            "kawaii",
+            "pack1"
+          ]
+        },
+        {
+          "id": "kawaii_002_001",
+          "name": "Kawaii 2-01",
+          "category": "kawaii",
+          "file": "kawaii_002_001.png",
+          "tags": [
+            "kawaii",
+            "pack2"
+          ]
+        },
+        {
+          "id": "kawaii_002_002",
+          "name": "Kawaii 2-02",
+          "category": "kawaii",
+          "file": "kawaii_002_002.png",
+          "tags": [
+            "kawaii",
+            "pack2"
+          ]
+        },
+        {
+          "id": "kawaii_002_003",
+          "name": "Kawaii 2-03",
+          "category": "kawaii",
+          "file": "kawaii_002_003.png",
+          "tags": [
+            "kawaii",
+            "pack2"
+          ]
+        },
+        {
+          "id": "kawaii_002_004",
+          "name": "Kawaii 2-04",
+          "category": "kawaii",
+          "file": "kawaii_002_004.png",
+          "tags": [
+            "kawaii",
+            "pack2"
+          ]
+        },
+        {
+          "id": "kawaii_002_005",
+          "name": "Kawaii 2-05",
+          "category": "kawaii",
+          "file": "kawaii_002_005.png",
+          "tags": [
+            "kawaii",
+            "pack2"
+          ]
+        },
+        {
+          "id": "kawaii_002_006",
+          "name": "Kawaii 2-06",
+          "category": "kawaii",
+          "file": "kawaii_002_006.png",
+          "tags": [
+            "kawaii",
+            "pack2"
+          ]
+        },
+        {
+          "id": "kawaii_002_007",
+          "name": "Kawaii 2-07",
+          "category": "kawaii",
+          "file": "kawaii_002_007.png",
+          "tags": [
+            "kawaii",
+            "pack2"
+          ]
+        },
+        {
+          "id": "kawaii_003_001",
+          "name": "Kawaii 3-01",
+          "category": "kawaii",
+          "file": "kawaii_003_001.png",
+          "tags": [
+            "kawaii",
+            "pack3"
+          ]
+        },
+        {
+          "id": "kawaii_003_002",
+          "name": "Kawaii 3-02",
+          "category": "kawaii",
+          "file": "kawaii_003_002.png",
+          "tags": [
+            "kawaii",
+            "pack3"
+          ]
+        },
+        {
+          "id": "kawaii_003_003",
+          "name": "Kawaii 3-03",
+          "category": "kawaii",
+          "file": "kawaii_003_003.png",
+          "tags": [
+            "kawaii",
+            "pack3"
+          ]
+        },
+        {
+          "id": "kawaii_003_004",
+          "name": "Kawaii 3-04",
+          "category": "kawaii",
+          "file": "kawaii_003_004.png",
+          "tags": [
+            "kawaii",
+            "pack3"
+          ]
+        },
+        {
+          "id": "kawaii_003_005",
+          "name": "Kawaii 3-05",
+          "category": "kawaii",
+          "file": "kawaii_003_005.png",
+          "tags": [
+            "kawaii",
+            "pack3"
+          ]
+        },
+        {
+          "id": "kawaii_003_006",
+          "name": "Kawaii 3-06",
+          "category": "kawaii",
+          "file": "kawaii_003_006.png",
+          "tags": [
+            "kawaii",
+            "pack3"
+          ]
+        },
+        {
+          "id": "kawaii_004_001",
+          "name": "Kawaii 4-01",
+          "category": "kawaii",
+          "file": "kawaii_004_001.png",
+          "tags": [
+            "kawaii",
+            "pack4"
+          ]
+        },
+        {
+          "id": "kawaii_004_002",
+          "name": "Kawaii 4-02",
+          "category": "kawaii",
+          "file": "kawaii_004_002.png",
+          "tags": [
+            "kawaii",
+            "pack4"
+          ]
+        },
+        {
+          "id": "kawaii_004_003",
+          "name": "Kawaii 4-03",
+          "category": "kawaii",
+          "file": "kawaii_004_003.png",
+          "tags": [
+            "kawaii",
+            "pack4"
+          ]
+        },
+        {
+          "id": "kawaii_004_004",
+          "name": "Kawaii 4-04",
+          "category": "kawaii",
+          "file": "kawaii_004_004.png",
+          "tags": [
+            "kawaii",
+            "pack4"
+          ]
+        },
+        {
+          "id": "kawaii_004_005",
+          "name": "Kawaii 4-05",
+          "category": "kawaii",
+          "file": "kawaii_004_005.png",
+          "tags": [
+            "kawaii",
+            "pack4"
+          ]
+        },
+        {
+          "id": "kawaii_005_001",
+          "name": "Kawaii 5-01",
+          "category": "kawaii",
+          "file": "kawaii_005_001.png",
+          "tags": [
+            "kawaii",
+            "pack5"
+          ]
+        },
+        {
+          "id": "kawaii_005_002",
+          "name": "Kawaii 5-02",
+          "category": "kawaii",
+          "file": "kawaii_005_002.png",
+          "tags": [
+            "kawaii",
+            "pack5"
+          ]
+        },
+        {
+          "id": "kawaii_005_003",
+          "name": "Kawaii 5-03",
+          "category": "kawaii",
+          "file": "kawaii_005_003.png",
+          "tags": [
+            "kawaii",
+            "pack5"
+          ]
+        },
+        {
+          "id": "kawaii_005_004",
+          "name": "Kawaii 5-04",
+          "category": "kawaii",
+          "file": "kawaii_005_004.png",
+          "tags": [
+            "kawaii",
+            "pack5"
+          ]
+        },
+        {
+          "id": "kawaii_005_005",
+          "name": "Kawaii 5-05",
+          "category": "kawaii",
+          "file": "kawaii_005_005.png",
+          "tags": [
+            "kawaii",
+            "pack5"
+          ]
+        },
+        {
+          "id": "kawaii_005_006",
+          "name": "Kawaii 5-06",
+          "category": "kawaii",
+          "file": "kawaii_005_006.png",
+          "tags": [
+            "kawaii",
+            "pack5"
+          ]
+        },
+        {
+          "id": "kawaii_005_007",
+          "name": "Kawaii 5-07",
+          "category": "kawaii",
+          "file": "kawaii_005_007.png",
+          "tags": [
+            "kawaii",
+            "pack5"
+          ]
+        },
+        {
+          "id": "kawaii_005_008",
+          "name": "Kawaii 5-08",
+          "category": "kawaii",
+          "file": "kawaii_005_008.png",
+          "tags": [
+            "kawaii",
+            "pack5"
+          ]
+        },
+        {
+          "id": "kawaii_005_009",
+          "name": "Kawaii 5-09",
+          "category": "kawaii",
+          "file": "kawaii_005_009.png",
+          "tags": [
+            "kawaii",
+            "pack5"
+          ]
+        },
+        {
+          "id": "kawaii_005_010",
+          "name": "Kawaii 5-10",
+          "category": "kawaii",
+          "file": "kawaii_005_010.png",
+          "tags": [
+            "kawaii",
+            "pack5"
+          ]
+        },
+        {
+          "id": "kawaii_006_001",
+          "name": "Kawaii 6-01",
+          "category": "kawaii",
+          "file": "kawaii_006_001.png",
+          "tags": [
+            "kawaii",
+            "pack6"
+          ]
+        },
+        {
+          "id": "kawaii_006_002",
+          "name": "Kawaii 6-02",
+          "category": "kawaii",
+          "file": "kawaii_006_002.png",
+          "tags": [
+            "kawaii",
+            "pack6"
+          ]
+        },
+        {
+          "id": "kawaii_006_003",
+          "name": "Kawaii 6-03",
+          "category": "kawaii",
+          "file": "kawaii_006_003.png",
+          "tags": [
+            "kawaii",
+            "pack6"
+          ]
+        },
+        {
+          "id": "kawaii_006_004",
+          "name": "Kawaii 6-04",
+          "category": "kawaii",
+          "file": "kawaii_006_004.png",
+          "tags": [
+            "kawaii",
+            "pack6"
+          ]
+        },
+        {
+          "id": "kawaii_006_005",
+          "name": "Kawaii 6-05",
+          "category": "kawaii",
+          "file": "kawaii_006_005.png",
+          "tags": [
+            "kawaii",
+            "pack6"
+          ]
+        },
+        {
+          "id": "kawaii_006_006",
+          "name": "Kawaii 6-06",
+          "category": "kawaii",
+          "file": "kawaii_006_006.png",
+          "tags": [
+            "kawaii",
+            "pack6"
+          ]
+        }
+      ]
     },
     {
       "name": "vintage",
@@ -832,7 +1223,408 @@
     {
       "name": "stamps",
       "label": "Stamps",
-      "stickers": []
+      "stickers": [
+        {
+          "id": "stamp_001_001",
+          "name": "Stamps 1-01",
+          "category": "stamps",
+          "file": "stamp_001_001.png",
+          "tags": [
+            "stamps",
+            "pack1"
+          ]
+        },
+        {
+          "id": "stamp_001_002",
+          "name": "Stamps 1-02",
+          "category": "stamps",
+          "file": "stamp_001_002.png",
+          "tags": [
+            "stamps",
+            "pack1"
+          ]
+        },
+        {
+          "id": "stamp_001_003",
+          "name": "Stamps 1-03",
+          "category": "stamps",
+          "file": "stamp_001_003.png",
+          "tags": [
+            "stamps",
+            "pack1"
+          ]
+        },
+        {
+          "id": "stamp_001_004",
+          "name": "Stamps 1-04",
+          "category": "stamps",
+          "file": "stamp_001_004.png",
+          "tags": [
+            "stamps",
+            "pack1"
+          ]
+        },
+        {
+          "id": "stamp_001_005",
+          "name": "Stamps 1-05",
+          "category": "stamps",
+          "file": "stamp_001_005.png",
+          "tags": [
+            "stamps",
+            "pack1"
+          ]
+        },
+        {
+          "id": "stamp_002_001",
+          "name": "Stamps 2-01",
+          "category": "stamps",
+          "file": "stamp_002_001.png",
+          "tags": [
+            "stamps",
+            "pack2"
+          ]
+        },
+        {
+          "id": "stamp_002_002",
+          "name": "Stamps 2-02",
+          "category": "stamps",
+          "file": "stamp_002_002.png",
+          "tags": [
+            "stamps",
+            "pack2"
+          ]
+        },
+        {
+          "id": "stamp_002_003",
+          "name": "Stamps 2-03",
+          "category": "stamps",
+          "file": "stamp_002_003.png",
+          "tags": [
+            "stamps",
+            "pack2"
+          ]
+        },
+        {
+          "id": "stamp_002_004",
+          "name": "Stamps 2-04",
+          "category": "stamps",
+          "file": "stamp_002_004.png",
+          "tags": [
+            "stamps",
+            "pack2"
+          ]
+        },
+        {
+          "id": "stamp_002_005",
+          "name": "Stamps 2-05",
+          "category": "stamps",
+          "file": "stamp_002_005.png",
+          "tags": [
+            "stamps",
+            "pack2"
+          ]
+        },
+        {
+          "id": "stamp_003_001",
+          "name": "Stamps 3-01",
+          "category": "stamps",
+          "file": "stamp_003_001.png",
+          "tags": [
+            "stamps",
+            "pack3"
+          ]
+        },
+        {
+          "id": "stamp_003_002",
+          "name": "Stamps 3-02",
+          "category": "stamps",
+          "file": "stamp_003_002.png",
+          "tags": [
+            "stamps",
+            "pack3"
+          ]
+        },
+        {
+          "id": "stamp_003_003",
+          "name": "Stamps 3-03",
+          "category": "stamps",
+          "file": "stamp_003_003.png",
+          "tags": [
+            "stamps",
+            "pack3"
+          ]
+        },
+        {
+          "id": "stamp_003_004",
+          "name": "Stamps 3-04",
+          "category": "stamps",
+          "file": "stamp_003_004.png",
+          "tags": [
+            "stamps",
+            "pack3"
+          ]
+        },
+        {
+          "id": "stamp_003_005",
+          "name": "Stamps 3-05",
+          "category": "stamps",
+          "file": "stamp_003_005.png",
+          "tags": [
+            "stamps",
+            "pack3"
+          ]
+        },
+        {
+          "id": "stamp_003_006",
+          "name": "Stamps 3-06",
+          "category": "stamps",
+          "file": "stamp_003_006.png",
+          "tags": [
+            "stamps",
+            "pack3"
+          ]
+        },
+        {
+          "id": "stamp_003_007",
+          "name": "Stamps 3-07",
+          "category": "stamps",
+          "file": "stamp_003_007.png",
+          "tags": [
+            "stamps",
+            "pack3"
+          ]
+        },
+        {
+          "id": "stamp_003_008",
+          "name": "Stamps 3-08",
+          "category": "stamps",
+          "file": "stamp_003_008.png",
+          "tags": [
+            "stamps",
+            "pack3"
+          ]
+        },
+        {
+          "id": "stamp_003_009",
+          "name": "Stamps 3-09",
+          "category": "stamps",
+          "file": "stamp_003_009.png",
+          "tags": [
+            "stamps",
+            "pack3"
+          ]
+        },
+        {
+          "id": "stamp_003_010",
+          "name": "Stamps 3-10",
+          "category": "stamps",
+          "file": "stamp_003_010.png",
+          "tags": [
+            "stamps",
+            "pack3"
+          ]
+        },
+        {
+          "id": "stamp_004_001",
+          "name": "Stamps 4-01",
+          "category": "stamps",
+          "file": "stamp_004_001.png",
+          "tags": [
+            "stamps",
+            "pack4"
+          ]
+        },
+        {
+          "id": "stamp_004_002",
+          "name": "Stamps 4-02",
+          "category": "stamps",
+          "file": "stamp_004_002.png",
+          "tags": [
+            "stamps",
+            "pack4"
+          ]
+        },
+        {
+          "id": "stamp_004_003",
+          "name": "Stamps 4-03",
+          "category": "stamps",
+          "file": "stamp_004_003.png",
+          "tags": [
+            "stamps",
+            "pack4"
+          ]
+        },
+        {
+          "id": "stamp_004_004",
+          "name": "Stamps 4-04",
+          "category": "stamps",
+          "file": "stamp_004_004.png",
+          "tags": [
+            "stamps",
+            "pack4"
+          ]
+        },
+        {
+          "id": "stamp_005_001",
+          "name": "Stamps 5-01",
+          "category": "stamps",
+          "file": "stamp_005_001.png",
+          "tags": [
+            "stamps",
+            "pack5"
+          ]
+        },
+        {
+          "id": "stamp_005_002",
+          "name": "Stamps 5-02",
+          "category": "stamps",
+          "file": "stamp_005_002.png",
+          "tags": [
+            "stamps",
+            "pack5"
+          ]
+        },
+        {
+          "id": "stamp_005_003",
+          "name": "Stamps 5-03",
+          "category": "stamps",
+          "file": "stamp_005_003.png",
+          "tags": [
+            "stamps",
+            "pack5"
+          ]
+        },
+        {
+          "id": "stamp_005_004",
+          "name": "Stamps 5-04",
+          "category": "stamps",
+          "file": "stamp_005_004.png",
+          "tags": [
+            "stamps",
+            "pack5"
+          ]
+        },
+        {
+          "id": "stamp_005_005",
+          "name": "Stamps 5-05",
+          "category": "stamps",
+          "file": "stamp_005_005.png",
+          "tags": [
+            "stamps",
+            "pack5"
+          ]
+        },
+        {
+          "id": "stamp_005_006",
+          "name": "Stamps 5-06",
+          "category": "stamps",
+          "file": "stamp_005_006.png",
+          "tags": [
+            "stamps",
+            "pack5"
+          ]
+        },
+        {
+          "id": "stamp_006_001",
+          "name": "Stamps 6-01",
+          "category": "stamps",
+          "file": "stamp_006_001.png",
+          "tags": [
+            "stamps",
+            "pack6"
+          ]
+        },
+        {
+          "id": "stamp_006_002",
+          "name": "Stamps 6-02",
+          "category": "stamps",
+          "file": "stamp_006_002.png",
+          "tags": [
+            "stamps",
+            "pack6"
+          ]
+        },
+        {
+          "id": "stamp_006_003",
+          "name": "Stamps 6-03",
+          "category": "stamps",
+          "file": "stamp_006_003.png",
+          "tags": [
+            "stamps",
+            "pack6"
+          ]
+        },
+        {
+          "id": "stamp_006_004",
+          "name": "Stamps 6-04",
+          "category": "stamps",
+          "file": "stamp_006_004.png",
+          "tags": [
+            "stamps",
+            "pack6"
+          ]
+        },
+        {
+          "id": "stamp_006_005",
+          "name": "Stamps 6-05",
+          "category": "stamps",
+          "file": "stamp_006_005.png",
+          "tags": [
+            "stamps",
+            "pack6"
+          ]
+        },
+        {
+          "id": "stamp_007_001",
+          "name": "Stamps 7-01",
+          "category": "stamps",
+          "file": "stamp_007_001.png",
+          "tags": [
+            "stamps",
+            "pack7"
+          ]
+        },
+        {
+          "id": "stamp_007_002",
+          "name": "Stamps 7-02",
+          "category": "stamps",
+          "file": "stamp_007_002.png",
+          "tags": [
+            "stamps",
+            "pack7"
+          ]
+        },
+        {
+          "id": "stamp_007_003",
+          "name": "Stamps 7-03",
+          "category": "stamps",
+          "file": "stamp_007_003.png",
+          "tags": [
+            "stamps",
+            "pack7"
+          ]
+        },
+        {
+          "id": "stamp_007_004",
+          "name": "Stamps 7-04",
+          "category": "stamps",
+          "file": "stamp_007_004.png",
+          "tags": [
+            "stamps",
+            "pack7"
+          ]
+        },
+        {
+          "id": "stamp_007_005",
+          "name": "Stamps 7-05",
+          "category": "stamps",
+          "file": "stamp_007_005.png",
+          "tags": [
+            "stamps",
+            "pack7"
+          ]
+        }
+      ]
     }
   ]
 }
