@@ -8,6 +8,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "export:web": "expo export --platform web",
+    "vercel-build": "npm run export:web",
     "lint": "expo lint",
     "stickers:sync": "node scripts/sync-stickers.mjs"
   },
