@@ -5,11 +5,10 @@ import JournalBookScreen from '../screens/JournalBookScreen';
 import NewEntryScreen from '../screens/NewEntryScreen';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
-import { PlacedSticker } from '../types/sticker';
 
 export type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: { page: number; newEntry?: { text: string; date: string; stickers?: PlacedSticker[] } };
+  JournalBook: { page: number; newEntry?: { text: string; date: string } };
   NewEntry: undefined;
 };
 

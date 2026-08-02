@@ -1,0 +1,89 @@
+{
+  "categories": [
+    {
+      "name": "flowers",
+      "label": "Flowers",
+      "stickers": []
+    },
+    {
+      "name": "coffee",
+      "label": "Coffee",
+      "stickers": []
+    },
+    {
+      "name": "study",
+      "label": "Study",
+      "stickers": []
+    },
+    {
+      "name": "travel",
+      "label": "Travel",
+      "stickers": []
+    },
+    {
+      "name": "coding",
+      "label": "Coding",
+      "stickers": []
+    },
+    {
+      "name": "animals",
+      "label": "Animals",
+      "stickers": []
+    },
+    {
+      "name": "birthday",
+      "label": "Birthday",
+      "stickers": []
+    },
+    {
+      "name": "holidays",
+      "label": "Holidays",
+      "stickers": []
+    },
+    {
+      "name": "emoji",
+      "label": "Emoji",
+      "stickers": []
+    },
+    {
+      "name": "food",
+      "label": "Food",
+      "stickers": []
+    },
+    {
+      "name": "nature",
+      "label": "Nature",
+      "stickers": []
+    },
+    {
+      "name": "kawaii",
+      "label": "Kawaii",
+      "stickers": []
+    },
+    {
+      "name": "vintage",
+      "label": "Vintage",
+      "stickers": []
+    },
+    {
+      "name": "shapes",
+      "label": "Shapes",
+      "stickers": []
+    },
+    {
+      "name": "washi",
+      "label": "Washi",
+      "stickers": []
+    },
+    {
+      "name": "frames",
+      "label": "Frames",
+      "stickers": []
+    },
+    {
+      "name": "stamps",
+      "label": "Stamps",
+      "stickers": []
+    }
+  ]
+}

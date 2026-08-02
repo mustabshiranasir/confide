@@ -21,12 +21,10 @@ import Animated, {
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 import JournalPage from '../components/JournalPage';
-import { PlacedSticker } from '../types/sticker';
-import StickerRenderer from '../components/StickerRenderer';
 
 type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: { page: number; newEntry?: { text: string; date: string; stickers?: PlacedSticker[] } };
+  JournalBook: { page: number; newEntry?: { text: string; date: string } };
   NewEntry: undefined;
 };
 
@@ -34,7 +32,6 @@ interface Entry {
   id: string;
   date: string;
   text: string;
-  stickers?: PlacedSticker[];
 }
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -113,27 +110,6 @@ function PageFlipItem({
           <Text style={styles.dateText}>{item.date}</Text>
           <View style={styles.dateUnderline} />
           <Text style={styles.entryText}>{item.text}</Text>
-
-          {item.stickers?.map((sticker) => (
-            <View
-              key={sticker.id}
-              style={{
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                width: 80,
-                height: 80,
-                transform: [
-                  { translateX: sticker.x },
-                  { translateY: sticker.y },
-                  { scale: sticker.scale },
-                  { rotateZ: `${sticker.rotation}rad` },
-                ],
-              }}
-            >
-              <StickerRenderer stickerId={sticker.stickerId} />
-            </View>
-          ))}
         </JournalPage>
       </Animated.View>
     </View>
@@ -153,7 +129,6 @@ export default function JournalBookScreen() {
           id: `new-${Date.now()}`,
           date: newEntryParam.date,
           text: newEntryParam.text,
-          stickers: newEntryParam.stickers,
         },
         ...SAMPLE_ENTRIES,
       ];

@@ -15,26 +15,15 @@ import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 import JournalPage from '../components/JournalPage';
 import { PaperStyle } from '../components/JournalPage';
-import StickerTray from '../components/StickerTray';
 import BackgroundPicker from '../components/BackgroundPicker';
-import DraggableSticker from '../components/DraggableSticker';
-import { PlacedSticker } from '../types/sticker';
 
 type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: { page: number; newEntry?: { text: string; date: string; stickers?: PlacedSticker[] } };
+  JournalBook: { page: number; newEntry?: { text: string; date: string } };
   NewEntry: undefined;
 };
 
 const INITIAL_HEIGHT = 280;
-
-function StickerIcon() {
-  return (
-    <View style={iconStyles.stickerOuter}>
-      <View style={iconStyles.stickerFold} />
-    </View>
-  );
-}
 
 function PaletteIcon() {
   return (
@@ -58,11 +47,8 @@ export default function NewEntryScreen() {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [text, setText] = useState('');
   const [contentHeight, setContentHeight] = useState(INITIAL_HEIGHT);
-  const [isStickerTrayOpen, setIsStickerTrayOpen] = useState(false);
   const [isBgPickerOpen, setIsBgPickerOpen] = useState(false);
   const [paperStyle, setPaperStyle] = useState<PaperStyle>('lined');
-  const [placedStickers, setPlacedStickers] = useState<PlacedSticker[]>([]);
-  const [activeStickerId, setActiveStickerId] = useState<string | null>(null);
   const textRef = useRef<TextInput>(null);
 
   const today = new Date().toLocaleDateString('en-US', {
@@ -80,36 +66,11 @@ export default function NewEntryScreen() {
 
   const handleSave = () => {
     const trimmed = text.trim();
-    if (!trimmed && placedStickers.length === 0) return;
+    if (!trimmed) return;
     navigation.navigate('JournalBook', {
       page: 0,
-      newEntry: { text: trimmed, date: today, stickers: placedStickers },
+      newEntry: { text: trimmed, date: today },
     });
-  };
-
-  const handleAddSticker = (stickerId: string) => {
-    const newSticker: PlacedSticker = {
-      id: `sticker-${Date.now()}`,
-      stickerId,
-      imageUrl: stickerId,
-      x: 100,
-      y: 100,
-      scale: 1,
-      rotation: 0,
-    };
-    setPlacedStickers((prev) => [...prev, newSticker]);
-    setActiveStickerId(newSticker.id);
-  };
-
-  const handleDeleteSticker = (id: string) => {
-    setPlacedStickers((prev) => prev.filter((s) => s.id !== id));
-    if (activeStickerId === id) setActiveStickerId(null);
-  };
-
-  const handleUpdateSticker = (id: string, updates: Partial<PlacedSticker>) => {
-    setPlacedStickers((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, ...updates } : s))
-    );
   };
 
   return (
@@ -144,17 +105,6 @@ export default function NewEntryScreen() {
             selectionColor={colors.accent}
             scrollEnabled={false}
           />
-
-          {placedStickers.map((sticker) => (
-            <DraggableSticker
-              key={sticker.id}
-              sticker={sticker}
-              isActive={activeStickerId === sticker.id}
-              onActivate={setActiveStickerId}
-              onUpdate={handleUpdateSticker}
-              onDelete={handleDeleteSticker}
-            />
-          ))}
         </JournalPage>
       </ScrollView>
 
@@ -162,45 +112,24 @@ export default function NewEntryScreen() {
         <TouchableOpacity
           style={styles.toolButton}
           activeOpacity={0.6}
-          onPress={() => {
-            setIsBgPickerOpen(false);
-            setIsStickerTrayOpen(true);
-          }}
-        >
-          <StickerIcon />
-          <Text style={styles.toolLabel}>Stickers</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.toolButton}
-          activeOpacity={0.6}
-          onPress={() => {
-            setIsStickerTrayOpen(false);
-            setIsBgPickerOpen((prev) => !prev);
-          }}
+          onPress={() => setIsBgPickerOpen((prev) => !prev)}
         >
           <PaletteIcon />
           <Text style={styles.toolLabel}>Background</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.saveButton, (!text.trim() && placedStickers.length === 0) && styles.saveButtonDisabled]}
+          style={[styles.saveButton, !text.trim() && styles.saveButtonDisabled]}
           activeOpacity={0.7}
           onPress={handleSave}
-          disabled={!text.trim() && placedStickers.length === 0}
+          disabled={!text.trim()}
         >
           <CheckIcon />
-          <Text style={[styles.saveLabel, (!text.trim() && placedStickers.length === 0) && styles.saveLabelDisabled]}>
+          <Text style={[styles.saveLabel, !text.trim() && styles.saveLabelDisabled]}>
             Save
           </Text>
         </TouchableOpacity>
       </View>
-
-      <StickerTray
-        isVisible={isStickerTrayOpen}
-        onSelectSticker={handleAddSticker}
-        onClose={() => setIsStickerTrayOpen(false)}
-      />
 
       <BackgroundPicker
         isVisible={isBgPickerOpen}
@@ -213,14 +142,6 @@ export default function NewEntryScreen() {
 }
 
 const iconStyles = StyleSheet.create({
-  stickerOuter: {
-    width: 22, height: 22, borderWidth: 1.5, borderColor: colors.text,
-    borderRadius: 3, position: 'relative', overflow: 'hidden',
-  },
-  stickerFold: {
-    position: 'absolute', top: 0, right: 0, width: 7, height: 7,
-    backgroundColor: colors.base, borderLeftWidth: 1.5, borderBottomWidth: 1.5, borderColor: colors.text,
-  },
   paletteOuter: {
     width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, borderColor: colors.text, position: 'relative',
   },
