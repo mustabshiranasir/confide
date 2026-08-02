@@ -3,7 +3,756 @@
     {
       "name": "flowers",
       "label": "Flowers",
-      "stickers": []
+      "stickers": [
+        {
+          "id": "flower_001_001",
+          "name": "Flower 1-01",
+          "category": "flowers",
+          "file": "flower_001_001.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack1"
+          ]
+        },
+        {
+          "id": "flower_001_002",
+          "name": "Flower 1-02",
+          "category": "flowers",
+          "file": "flower_001_002.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack1"
+          ]
+        },
+        {
+          "id": "flower_001_003",
+          "name": "Flower 1-03",
+          "category": "flowers",
+          "file": "flower_001_003.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack1"
+          ]
+        },
+        {
+          "id": "flower_001_004",
+          "name": "Flower 1-04",
+          "category": "flowers",
+          "file": "flower_001_004.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack1"
+          ]
+        },
+        {
+          "id": "flower_001_005",
+          "name": "Flower 1-05",
+          "category": "flowers",
+          "file": "flower_001_005.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack1"
+          ]
+        },
+        {
+          "id": "flower_001_006",
+          "name": "Flower 1-06",
+          "category": "flowers",
+          "file": "flower_001_006.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack1"
+          ]
+        },
+        {
+          "id": "flower_001_007",
+          "name": "Flower 1-07",
+          "category": "flowers",
+          "file": "flower_001_007.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack1"
+          ]
+        },
+        {
+          "id": "flower_001_008",
+          "name": "Flower 1-08",
+          "category": "flowers",
+          "file": "flower_001_008.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack1"
+          ]
+        },
+        {
+          "id": "flower_001_009",
+          "name": "Flower 1-09",
+          "category": "flowers",
+          "file": "flower_001_009.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack1"
+          ]
+        },
+        {
+          "id": "flower_001_010",
+          "name": "Flower 1-10",
+          "category": "flowers",
+          "file": "flower_001_010.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack1"
+          ]
+        },
+        {
+          "id": "flower_002_001",
+          "name": "Flower 2-01",
+          "category": "flowers",
+          "file": "flower_002_001.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_002",
+          "name": "Flower 2-02",
+          "category": "flowers",
+          "file": "flower_002_002.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_003",
+          "name": "Flower 2-03",
+          "category": "flowers",
+          "file": "flower_002_003.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_004",
+          "name": "Flower 2-04",
+          "category": "flowers",
+          "file": "flower_002_004.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_005",
+          "name": "Flower 2-05",
+          "category": "flowers",
+          "file": "flower_002_005.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_006",
+          "name": "Flower 2-06",
+          "category": "flowers",
+          "file": "flower_002_006.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_007",
+          "name": "Flower 2-07",
+          "category": "flowers",
+          "file": "flower_002_007.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_008",
+          "name": "Flower 2-08",
+          "category": "flowers",
+          "file": "flower_002_008.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_009",
+          "name": "Flower 2-09",
+          "category": "flowers",
+          "file": "flower_002_009.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_010",
+          "name": "Flower 2-10",
+          "category": "flowers",
+          "file": "flower_002_010.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_011",
+          "name": "Flower 2-11",
+          "category": "flowers",
+          "file": "flower_002_011.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_012",
+          "name": "Flower 2-12",
+          "category": "flowers",
+          "file": "flower_002_012.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_013",
+          "name": "Flower 2-13",
+          "category": "flowers",
+          "file": "flower_002_013.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_014",
+          "name": "Flower 2-14",
+          "category": "flowers",
+          "file": "flower_002_014.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_015",
+          "name": "Flower 2-15",
+          "category": "flowers",
+          "file": "flower_002_015.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_016",
+          "name": "Flower 2-16",
+          "category": "flowers",
+          "file": "flower_002_016.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_017",
+          "name": "Flower 2-17",
+          "category": "flowers",
+          "file": "flower_002_017.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_018",
+          "name": "Flower 2-18",
+          "category": "flowers",
+          "file": "flower_002_018.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_019",
+          "name": "Flower 2-19",
+          "category": "flowers",
+          "file": "flower_002_019.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_020",
+          "name": "Flower 2-20",
+          "category": "flowers",
+          "file": "flower_002_020.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_021",
+          "name": "Flower 2-21",
+          "category": "flowers",
+          "file": "flower_002_021.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_022",
+          "name": "Flower 2-22",
+          "category": "flowers",
+          "file": "flower_002_022.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_023",
+          "name": "Flower 2-23",
+          "category": "flowers",
+          "file": "flower_002_023.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_024",
+          "name": "Flower 2-24",
+          "category": "flowers",
+          "file": "flower_002_024.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_025",
+          "name": "Flower 2-25",
+          "category": "flowers",
+          "file": "flower_002_025.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_026",
+          "name": "Flower 2-26",
+          "category": "flowers",
+          "file": "flower_002_026.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_027",
+          "name": "Flower 2-27",
+          "category": "flowers",
+          "file": "flower_002_027.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_002_028",
+          "name": "Flower 2-28",
+          "category": "flowers",
+          "file": "flower_002_028.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack2"
+          ]
+        },
+        {
+          "id": "flower_003_001",
+          "name": "Flower 3-01",
+          "category": "flowers",
+          "file": "flower_003_001.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_002",
+          "name": "Flower 3-02",
+          "category": "flowers",
+          "file": "flower_003_002.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_003",
+          "name": "Flower 3-03",
+          "category": "flowers",
+          "file": "flower_003_003.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_004",
+          "name": "Flower 3-04",
+          "category": "flowers",
+          "file": "flower_003_004.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_005",
+          "name": "Flower 3-05",
+          "category": "flowers",
+          "file": "flower_003_005.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_006",
+          "name": "Flower 3-06",
+          "category": "flowers",
+          "file": "flower_003_006.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_007",
+          "name": "Flower 3-07",
+          "category": "flowers",
+          "file": "flower_003_007.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_008",
+          "name": "Flower 3-08",
+          "category": "flowers",
+          "file": "flower_003_008.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_009",
+          "name": "Flower 3-09",
+          "category": "flowers",
+          "file": "flower_003_009.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_010",
+          "name": "Flower 3-10",
+          "category": "flowers",
+          "file": "flower_003_010.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_011",
+          "name": "Flower 3-11",
+          "category": "flowers",
+          "file": "flower_003_011.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_012",
+          "name": "Flower 3-12",
+          "category": "flowers",
+          "file": "flower_003_012.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_013",
+          "name": "Flower 3-13",
+          "category": "flowers",
+          "file": "flower_003_013.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_014",
+          "name": "Flower 3-14",
+          "category": "flowers",
+          "file": "flower_003_014.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_015",
+          "name": "Flower 3-15",
+          "category": "flowers",
+          "file": "flower_003_015.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_016",
+          "name": "Flower 3-16",
+          "category": "flowers",
+          "file": "flower_003_016.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_017",
+          "name": "Flower 3-17",
+          "category": "flowers",
+          "file": "flower_003_017.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_018",
+          "name": "Flower 3-18",
+          "category": "flowers",
+          "file": "flower_003_018.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_019",
+          "name": "Flower 3-19",
+          "category": "flowers",
+          "file": "flower_003_019.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_020",
+          "name": "Flower 3-20",
+          "category": "flowers",
+          "file": "flower_003_020.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_021",
+          "name": "Flower 3-21",
+          "category": "flowers",
+          "file": "flower_003_021.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_022",
+          "name": "Flower 3-22",
+          "category": "flowers",
+          "file": "flower_003_022.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_023",
+          "name": "Flower 3-23",
+          "category": "flowers",
+          "file": "flower_003_023.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_024",
+          "name": "Flower 3-24",
+          "category": "flowers",
+          "file": "flower_003_024.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_025",
+          "name": "Flower 3-25",
+          "category": "flowers",
+          "file": "flower_003_025.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_026",
+          "name": "Flower 3-26",
+          "category": "flowers",
+          "file": "flower_003_026.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_027",
+          "name": "Flower 3-27",
+          "category": "flowers",
+          "file": "flower_003_027.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_028",
+          "name": "Flower 3-28",
+          "category": "flowers",
+          "file": "flower_003_028.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_029",
+          "name": "Flower 3-29",
+          "category": "flowers",
+          "file": "flower_003_029.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        },
+        {
+          "id": "flower_003_030",
+          "name": "Flower 3-30",
+          "category": "flowers",
+          "file": "flower_003_030.png",
+          "tags": [
+            "flower",
+            "floral",
+            "pack3"
+          ]
+        }
+      ]
     },
     {
       "name": "coffee",
