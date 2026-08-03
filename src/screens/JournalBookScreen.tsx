@@ -170,6 +170,7 @@ export default function JournalBookScreen() {
   const [persisted, setPersisted] = useState<JournalEntry[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [removedSampleIds, setRemovedSampleIds] = useState<string[]>([]);
 
   const loadEntries = useCallback(async () => {
     const entries = await getAllEntries();
@@ -192,8 +193,9 @@ export default function JournalBookScreen() {
       seen.add(e.id);
       return true;
     });
-    return deduped.length > 0 ? deduped : SAMPLE_ENTRIES;
-  }, [loaded, persisted, newEntryParam]);
+    const samples = SAMPLE_ENTRIES.filter((s) => !removedSampleIds.includes(s.id));
+    return deduped.length > 0 ? deduped : samples;
+  }, [loaded, persisted, newEntryParam, removedSampleIds]);
 
   const [currentPage, setCurrentPage] = useState(startPage);
   const scrollX = useSharedValue(startPage * PAGE_W);
@@ -214,6 +216,7 @@ export default function JournalBookScreen() {
     if (!pendingDeleteId) return;
     await deleteEntry(pendingDeleteId);
     setPersisted((prev) => prev.filter((e) => e.id !== pendingDeleteId));
+    setRemovedSampleIds((prev) => (prev.includes(pendingDeleteId) ? prev : [...prev, pendingDeleteId]));
     setPendingDeleteId(null);
   }, [pendingDeleteId]);
 
@@ -274,11 +277,23 @@ export default function JournalBookScreen() {
       )}
 
       <View style={styles.folioBar}>
+        <TouchableOpacity
+          style={styles.folioDeleteButton}
+          activeOpacity={0.7}
+          onPress={() => {
+            const page = Math.min(currentPage, entries.length - 1);
+            const current = entries[page];
+            if (current) setPendingDeleteId(current.id);
+          }}
+        >
+          <Text style={styles.folioDeleteText}>Delete page</Text>
+        </TouchableOpacity>
         <View style={styles.folioDivider} />
         <Text style={styles.folioText}>
-          {currentPage + 1} {'\u2014'} {entries.length}
+          {Math.min(currentPage, Math.max(entries.length - 1, 0)) + 1} {'\u2014'} {entries.length}
         </Text>
         <View style={styles.folioDivider} />
+        <View style={styles.folioSpacer} />
       </View>
 
       <TouchableOpacity
@@ -311,7 +326,13 @@ const styles = StyleSheet.create({
   entryText: { fontFamily: fonts.handwritten, fontSize: 24, color: colors.text, lineHeight: 36 },
   folioBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 10, gap: 16 },
   folioDivider: { width: 32, height: 1, backgroundColor: 'rgba(74,74,74,0.15)' },
+  folioSpacer: { width: 88 },
   folioText: { fontFamily: fonts.ui, fontSize: 12, color: colors.textLight, letterSpacing: 2 },
+  folioDeleteButton: {
+    width: 88, paddingVertical: 6, borderRadius: 12,
+    backgroundColor: 'rgba(224,93,93,0.1)', borderWidth: 1, borderColor: 'rgba(224,93,93,0.3)',
+  },
+  folioDeleteText: { fontFamily: fonts.uiSemiBold, fontSize: 12, color: '#E05D5D', textAlign: 'center' },
   deleteBanner: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     marginHorizontal: 20, marginBottom: 8, paddingVertical: 10, paddingHorizontal: 16,
