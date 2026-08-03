@@ -9,9 +9,15 @@ export interface StickerToolbarProps {
   onSendToBack: () => void;
   onOpacityDown: () => void;
   onOpacityUp: () => void;
+  onWidthDown: () => void;
+  onWidthUp: () => void;
+  onHeightDown: () => void;
+  onHeightUp: () => void;
   onDelete: () => void;
   onClose: () => void;
   opacity: number;
+  widthScale: number;
+  heightScale: number;
   canBringToFront: boolean;
   canSendToBack: boolean;
 }
@@ -45,9 +51,15 @@ export default function StickerToolbar({
   onSendToBack,
   onOpacityDown,
   onOpacityUp,
+  onWidthDown,
+  onWidthUp,
+  onHeightDown,
+  onHeightUp,
   onDelete,
   onClose,
   opacity,
+  widthScale,
+  heightScale,
   canBringToFront,
   canSendToBack,
 }: StickerToolbarProps) {
@@ -58,6 +70,10 @@ export default function StickerToolbar({
       <ToolbarButton label="▼ Back" onPress={onSendToBack} disabled={!canSendToBack} />
       <ToolbarButton label="− Opacity" onPress={onOpacityDown} disabled={opacity <= 0.2} />
       <ToolbarButton label="+ Opacity" onPress={onOpacityUp} disabled={opacity >= 1} />
+      <ToolbarButton label="↔ W−" onPress={onWidthDown} disabled={widthScale <= 0.4} />
+      <ToolbarButton label="↔ W+" onPress={onWidthUp} disabled={widthScale >= 6} />
+      <ToolbarButton label="↕ H−" onPress={onHeightDown} disabled={heightScale <= 0.4} />
+      <ToolbarButton label="↕ H+" onPress={onHeightUp} disabled={heightScale >= 6} />
       <ToolbarButton label="✕ Delete" onPress={onDelete} danger />
       <ToolbarButton label="Done" onPress={onClose} />
     </View>

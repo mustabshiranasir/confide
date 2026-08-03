@@ -6,7 +6,7 @@ import { ImageSourcePropType } from 'react-native';
 const catalog = stickerCatalogJson as StickerCatalog;
 
 let byIdMap: Map<string, Sticker> | null = null;
-let sourceCache: Map<string, ImageSourcePropType | undefined> | null = null;
+const sourceCache = new Map<string, ImageSourcePropType | undefined>();
 
 function buildByIdMap(): Map<string, Sticker> {
   if (!byIdMap) {
@@ -35,13 +35,9 @@ export function getStickerById(stickerId: string): Sticker | undefined {
 }
 
 export function getStickerSource(stickerId: string): ImageSourcePropType | undefined {
-  if (!sourceCache) {
-    sourceCache = new Map();
-    for (const category of catalog.categories) {
-      for (const sticker of category.stickers) {
-        sourceCache.set(sticker.id, resolveSticker(sticker.file));
-      }
-    }
+  if (!sourceCache.has(stickerId)) {
+    const sticker = getStickerById(stickerId);
+    sourceCache.set(stickerId, sticker ? resolveSticker(sticker.file) : undefined);
   }
   return sourceCache.get(stickerId);
 }

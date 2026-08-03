@@ -31,6 +31,7 @@ type RootStackParamList = {
 
 const INITIAL_HEIGHT = 280;
 const OPACITY_STEP = 0.2;
+const WIDTH_HEIGHT_STEP = 0.2;
 
 const STICKER_PETALS = [
   [12, 8.9],
@@ -171,6 +172,8 @@ export default function NewEntryScreen() {
       scale: 1,
       rotation: 0,
       opacity: 1,
+      widthScale: 1,
+      heightScale: 1,
     };
     setStickers((prev) => [...prev, newSticker]);
     setActiveStickerId(newSticker.id);
@@ -227,6 +230,28 @@ export default function NewEntryScreen() {
     );
   };
 
+  const handleWidthChange = (delta: number) => {
+    if (!activeStickerId) return;
+    setStickers((prev) =>
+      prev.map((s) =>
+        s.id === activeStickerId
+          ? { ...s, widthScale: Math.min(6, Math.max(0.4, Math.round(((s.widthScale ?? 1) + delta) * 10) / 10)) }
+          : s
+      )
+    );
+  };
+
+  const handleHeightChange = (delta: number) => {
+    if (!activeStickerId) return;
+    setStickers((prev) =>
+      prev.map((s) =>
+        s.id === activeStickerId
+          ? { ...s, heightScale: Math.min(6, Math.max(0.4, Math.round(((s.heightScale ?? 1) + delta) * 10) / 10)) }
+          : s
+      )
+    );
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -277,9 +302,15 @@ export default function NewEntryScreen() {
           onSendToBack={handleSendToBack}
           onOpacityDown={() => handleOpacityChange(-OPACITY_STEP)}
           onOpacityUp={() => handleOpacityChange(OPACITY_STEP)}
+          onWidthDown={() => handleWidthChange(-WIDTH_HEIGHT_STEP)}
+          onWidthUp={() => handleWidthChange(WIDTH_HEIGHT_STEP)}
+          onHeightDown={() => handleHeightChange(-WIDTH_HEIGHT_STEP)}
+          onHeightUp={() => handleHeightChange(WIDTH_HEIGHT_STEP)}
           onDelete={() => handleDeleteSticker(activeSticker.id)}
           onClose={() => setActiveStickerId(null)}
           opacity={activeSticker.opacity}
+          widthScale={activeSticker.widthScale ?? 1}
+          heightScale={activeSticker.heightScale ?? 1}
           canBringToFront={activeIndex < placedStickers.length - 1}
           canSendToBack={activeIndex > 0}
         />

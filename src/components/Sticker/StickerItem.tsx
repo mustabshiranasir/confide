@@ -49,6 +49,8 @@ export default function StickerItem({
   onDelete,
 }: StickerItemProps) {
   const source = getStickerSource(sticker.stickerId);
+  const widthScale = sticker.widthScale ?? 1;
+  const heightScale = sticker.heightScale ?? 1;
 
   const translateX = useSharedValue(sticker.x);
   const translateY = useSharedValue(sticker.y);
@@ -143,7 +145,9 @@ export default function StickerItem({
       baseY.value = translateY.value;
       centerX.value = translateX.value + BASE_SIZE / 2;
       centerY.value = translateY.value + BASE_SIZE / 2;
-      const corner = rotateOffset(BASE_SIZE / 2, BASE_SIZE / 2, rotation.value, scale.value);
+      const halfW = (BASE_SIZE / 2) * scale.value * widthScale;
+      const halfH = (BASE_SIZE / 2) * scale.value * heightScale;
+      const corner = rotateOffset(halfW, halfH, rotation.value, 1);
       startHandleX.value = centerX.value + corner.x;
       startHandleY.value = centerY.value + corner.y;
       const dx = startHandleX.value - centerX.value;
@@ -174,7 +178,8 @@ export default function StickerItem({
       baseY.value = translateY.value;
       centerX.value = translateX.value + BASE_SIZE / 2;
       centerY.value = translateY.value + BASE_SIZE / 2;
-      const top = rotateOffset(0, -BASE_SIZE / 2, rotation.value, scale.value);
+      const halfH = (BASE_SIZE / 2) * scale.value * heightScale;
+      const top = rotateOffset(0, -halfH, rotation.value, 1);
       startHandleX.value = centerX.value + top.x;
       startHandleY.value = centerY.value + top.y;
       startAngle.value = Math.atan2(
@@ -199,14 +204,17 @@ export default function StickerItem({
     transform: [
       { translateX: translateX.value },
       { translateY: translateY.value },
-      { scale: scale.value },
+      { scaleX: scale.value * widthScale },
+      { scaleY: scale.value * heightScale },
       { rotateZ: `${rotation.value}rad` },
     ],
     opacity: sticker.opacity,
   }));
 
   const resizeStyle = useAnimatedStyle(() => {
-    const corner = rotateOffset(BASE_SIZE / 2, BASE_SIZE / 2, rotation.value, scale.value);
+    const halfW = (BASE_SIZE / 2) * scale.value * widthScale;
+    const halfH = (BASE_SIZE / 2) * scale.value * heightScale;
+    const corner = rotateOffset(halfW, halfH, rotation.value, 1);
     return {
       left: translateX.value + BASE_SIZE / 2 + corner.x - HANDLE_SIZE / 2,
       top: translateY.value + BASE_SIZE / 2 + corner.y - HANDLE_SIZE / 2,
@@ -214,7 +222,8 @@ export default function StickerItem({
   });
 
   const rotateHandleStyle = useAnimatedStyle(() => {
-    const top = rotateOffset(0, -BASE_SIZE / 2, rotation.value, scale.value);
+    const halfH = (BASE_SIZE / 2) * scale.value * heightScale;
+    const top = rotateOffset(0, -halfH, rotation.value, 1);
     return {
       left: translateX.value + BASE_SIZE / 2 + top.x - HANDLE_SIZE / 2,
       top: translateY.value + BASE_SIZE / 2 + top.y - HANDLE_SIZE / 2,

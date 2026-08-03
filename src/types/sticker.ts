@@ -24,4 +24,6 @@ export interface PlacedSticker {
   scale: number;
   rotation: number;
   opacity: number;
+  widthScale?: number;
+  heightScale?: number;
 }

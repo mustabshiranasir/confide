@@ -21,13 +21,19 @@ const CATALOG_PATH = path.join(ROOT, 'src', 'data', 'stickers.json');
 const ASSETS_TS_PATH = path.join(ROOT, 'src', 'data', 'stickerAssets.ts');
 
 const SHEET_RE = /^pack\d+\.png$/i;
+const WASHI_SHEET_RE = /^newpack\d*\.png$/i;
 const STICKER_RE = /^(.+?)_(\d{3})_(\d{3})\.png$/;
 
 function listStickerFiles(categoryDir) {
   if (!fs.existsSync(categoryDir)) return [];
   return fs
     .readdirSync(categoryDir)
-    .filter((f) => f.toLowerCase().endsWith('.png') && !SHEET_RE.test(f))
+    .filter(
+      (f) =>
+        f.toLowerCase().endsWith('.png') &&
+        !SHEET_RE.test(f) &&
+        !WASHI_SHEET_RE.test(f),
+    )
     .sort();
 }
 

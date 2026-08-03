@@ -133,7 +133,8 @@ function PageFlipItem({
                   transform: [
                     { translateX: sticker.x },
                     { translateY: sticker.y },
-                    { scale: sticker.scale },
+                    { scaleX: sticker.scale * (sticker.widthScale ?? 1) },
+                    { scaleY: sticker.scale * (sticker.heightScale ?? 1) },
                     { rotateZ: `${sticker.rotation}rad` },
                   ],
                 }}

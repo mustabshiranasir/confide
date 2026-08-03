@@ -1213,7 +1213,258 @@
     {
       "name": "washi",
       "label": "Washi",
-      "stickers": []
+      "stickers": [
+        {
+          "id": "washi_001_001",
+          "name": "Washi 1-01",
+          "category": "washi",
+          "file": "washi_001_001.png",
+          "tags": [
+            "washi",
+            "pack1"
+          ]
+        },
+        {
+          "id": "washi_001_002",
+          "name": "Washi 1-02",
+          "category": "washi",
+          "file": "washi_001_002.png",
+          "tags": [
+            "washi",
+            "pack1"
+          ]
+        },
+        {
+          "id": "washi_001_003",
+          "name": "Washi 1-03",
+          "category": "washi",
+          "file": "washi_001_003.png",
+          "tags": [
+            "washi",
+            "pack1"
+          ]
+        },
+        {
+          "id": "washi_001_004",
+          "name": "Washi 1-04",
+          "category": "washi",
+          "file": "washi_001_004.png",
+          "tags": [
+            "washi",
+            "pack1"
+          ]
+        },
+        {
+          "id": "washi_001_005",
+          "name": "Washi 1-05",
+          "category": "washi",
+          "file": "washi_001_005.png",
+          "tags": [
+            "washi",
+            "pack1"
+          ]
+        },
+        {
+          "id": "washi_001_006",
+          "name": "Washi 1-06",
+          "category": "washi",
+          "file": "washi_001_006.png",
+          "tags": [
+            "washi",
+            "pack1"
+          ]
+        },
+        {
+          "id": "washi_001_007",
+          "name": "Washi 1-07",
+          "category": "washi",
+          "file": "washi_001_007.png",
+          "tags": [
+            "washi",
+            "pack1"
+          ]
+        },
+        {
+          "id": "washi_002_001",
+          "name": "Washi 2-01",
+          "category": "washi",
+          "file": "washi_002_001.png",
+          "tags": [
+            "washi",
+            "pack2"
+          ]
+        },
+        {
+          "id": "washi_002_002",
+          "name": "Washi 2-02",
+          "category": "washi",
+          "file": "washi_002_002.png",
+          "tags": [
+            "washi",
+            "pack2"
+          ]
+        },
+        {
+          "id": "washi_002_003",
+          "name": "Washi 2-03",
+          "category": "washi",
+          "file": "washi_002_003.png",
+          "tags": [
+            "washi",
+            "pack2"
+          ]
+        },
+        {
+          "id": "washi_002_004",
+          "name": "Washi 2-04",
+          "category": "washi",
+          "file": "washi_002_004.png",
+          "tags": [
+            "washi",
+            "pack2"
+          ]
+        },
+        {
+          "id": "washi_002_005",
+          "name": "Washi 2-05",
+          "category": "washi",
+          "file": "washi_002_005.png",
+          "tags": [
+            "washi",
+            "pack2"
+          ]
+        },
+        {
+          "id": "washi_002_006",
+          "name": "Washi 2-06",
+          "category": "washi",
+          "file": "washi_002_006.png",
+          "tags": [
+            "washi",
+            "pack2"
+          ]
+        },
+        {
+          "id": "washi_003_001",
+          "name": "Washi 3-01",
+          "category": "washi",
+          "file": "washi_003_001.png",
+          "tags": [
+            "washi",
+            "pack3"
+          ]
+        },
+        {
+          "id": "washi_003_002",
+          "name": "Washi 3-02",
+          "category": "washi",
+          "file": "washi_003_002.png",
+          "tags": [
+            "washi",
+            "pack3"
+          ]
+        },
+        {
+          "id": "washi_003_003",
+          "name": "Washi 3-03",
+          "category": "washi",
+          "file": "washi_003_003.png",
+          "tags": [
+            "washi",
+            "pack3"
+          ]
+        },
+        {
+          "id": "washi_003_004",
+          "name": "Washi 3-04",
+          "category": "washi",
+          "file": "washi_003_004.png",
+          "tags": [
+            "washi",
+            "pack3"
+          ]
+        },
+        {
+          "id": "washi_003_005",
+          "name": "Washi 3-05",
+          "category": "washi",
+          "file": "washi_003_005.png",
+          "tags": [
+            "washi",
+            "pack3"
+          ]
+        },
+        {
+          "id": "washi_003_006",
+          "name": "Washi 3-06",
+          "category": "washi",
+          "file": "washi_003_006.png",
+          "tags": [
+            "washi",
+            "pack3"
+          ]
+        },
+        {
+          "id": "washi_004_001",
+          "name": "Washi 4-01",
+          "category": "washi",
+          "file": "washi_004_001.png",
+          "tags": [
+            "washi",
+            "pack4"
+          ]
+        },
+        {
+          "id": "washi_004_002",
+          "name": "Washi 4-02",
+          "category": "washi",
+          "file": "washi_004_002.png",
+          "tags": [
+            "washi",
+            "pack4"
+          ]
+        },
+        {
+          "id": "washi_005_001",
+          "name": "Washi 5-01",
+          "category": "washi",
+          "file": "washi_005_001.png",
+          "tags": [
+            "washi",
+            "pack5"
+          ]
+        },
+        {
+          "id": "washi_005_002",
+          "name": "Washi 5-02",
+          "category": "washi",
+          "file": "washi_005_002.png",
+          "tags": [
+            "washi",
+            "pack5"
+          ]
+        },
+        {
+          "id": "washi_005_003",
+          "name": "Washi 5-03",
+          "category": "washi",
+          "file": "washi_005_003.png",
+          "tags": [
+            "washi",
+            "pack5"
+          ]
+        },
+        {
+          "id": "washi_005_004",
+          "name": "Washi 5-04",
+          "category": "washi",
+          "file": "washi_005_004.png",
+          "tags": [
+            "washi",
+            "pack5"
+          ]
+        }
+      ]
     },
     {
       "name": "frames",
