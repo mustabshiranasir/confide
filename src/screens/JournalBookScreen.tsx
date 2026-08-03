@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   ListRenderItemInfo,
   Image,
 } from 'react-native';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import Animated, {
   useSharedValue,
@@ -24,27 +24,28 @@ import { fonts } from '../theme/fonts';
 import JournalPage, { getPaperInk, PaperStyle } from '../components/JournalPage';
 import { PlacedSticker } from '../types/sticker';
 import { getStickerSource } from '../data/stickers';
-import { loadEntries, StoredEntry } from '../data/journalStore';
+import { getAllEntries, deleteEntry } from '../storage/journalStorage';
 
 type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: { page: number; newEntry?: { id: string; text: string; date: string; stickers?: PlacedSticker[]; background?: PaperStyle } };
+  JournalBook: { page: number; newEntry?: { id: string; text: string; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; background?: PaperStyle } };
   NewEntry: undefined;
 };
 
-interface Entry {
+interface JournalEntry {
   id: string;
   date: string;
   text: string;
   stickers?: PlacedSticker[];
+  decorations?: PlacedSticker[];
   background?: PaperStyle;
 }
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const PAGE_W = SCREEN_W - 40;
-const AnimatedFlatList = Animated.createAnimatedComponent(FlatList<Entry>);
+const AnimatedFlatList = Animated.createAnimatedComponent(FlatList<JournalEntry>);
 
-const SAMPLE_ENTRIES: Entry[] = [
+const SAMPLE_ENTRIES: JournalEntry[] = [
   {
     id: '1',
     date: 'July 27, 2026',
@@ -76,10 +77,12 @@ function PageFlipItem({
   item,
   index,
   scrollX,
+  onLongPress,
 }: {
-  item: Entry;
+  item: JournalEntry;
   index: number;
   scrollX: SharedValue<number>;
+  onLongPress: () => void;
 }) {
   const animatedStyle = useAnimatedStyle(() => {
     const pageOffset = index * PAGE_W;
@@ -108,16 +111,24 @@ function PageFlipItem({
     };
   });
 
+  const placedStickers = item.decorations ?? item.stickers;
+
   return (
     <View style={styles.pageWrapper}>
-      <Animated.View style={[styles.pageContainer, animatedStyle]}>
-        <JournalPage background={item.background ?? 'custom'} style={styles.diaryPage}>
-          <View style={styles.tapeStrip} />
-          <Text style={styles.dateText}>{item.date}</Text>
-          <View style={styles.dateUnderline} />
-          <Text style={[styles.entryText, { color: getPaperInk(item.background ?? 'custom') }]}>{item.text}</Text>
+      <TouchableOpacity
+        activeOpacity={1}
+        delayLongPress={450}
+        onLongPress={onLongPress}
+        style={styles.pageTouchable}
+      >
+        <Animated.View style={[styles.pageContainer, animatedStyle]}>
+          <JournalPage background={item.background ?? 'custom'} style={styles.diaryPage}>
+            <View style={styles.tapeStrip} />
+            <Text style={styles.dateText}>{item.date}</Text>
+            <View style={styles.dateUnderline} />
+            <Text style={[styles.entryText, { color: getPaperInk(item.background ?? 'custom') }]}>{item.text}</Text>
 
-          {item.stickers?.map((sticker) => {
+            {placedStickers?.map((sticker) => {
             const source = getStickerSource(sticker.stickerId);
             if (!source) return null;
             return (
@@ -144,7 +155,8 @@ function PageFlipItem({
             );
           })}
         </JournalPage>
-      </Animated.View>
+        </Animated.View>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -155,37 +167,32 @@ export default function JournalBookScreen() {
   const newEntryParam = route.params?.newEntry;
   const startPage = route.params?.page ?? 0;
 
-  const [persisted, setPersisted] = useState<StoredEntry[]>([]);
+  const [persisted, setPersisted] = useState<JournalEntry[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
-  useEffect(() => {
-    let mounted = true;
-    loadEntries().then((entries) => {
-      if (mounted) {
-        setPersisted(entries);
-        setLoaded(true);
-      }
-    });
-    return () => { mounted = false; };
+  const loadEntries = useCallback(async () => {
+    const entries = await getAllEntries();
+    setPersisted(entries);
+    setLoaded(true);
   }, []);
 
-  const entries: Entry[] = React.useMemo(() => {
+  useFocusEffect(
+    useCallback(() => {
+      loadEntries();
+    }, [loadEntries]),
+  );
+
+  const entries: JournalEntry[] = React.useMemo(() => {
     const base = loaded ? persisted : [];
-    const mapEntry = (e: StoredEntry): Entry => ({
-      id: e.id,
-      date: e.date,
-      text: e.text,
-      stickers: e.stickers,
-      background: e.background,
-    });
-    const all = newEntryParam ? [mapEntry(newEntryParam), ...base] : [...base];
+    const all = newEntryParam ? [newEntryParam, ...base] : [...base];
     const seen = new Set<string>();
     const deduped = all.filter((e) => {
       if (seen.has(e.id)) return false;
       seen.add(e.id);
       return true;
     });
-    return [...deduped, ...SAMPLE_ENTRIES];
+    return deduped.length > 0 ? deduped : SAMPLE_ENTRIES;
   }, [loaded, persisted, newEntryParam]);
 
   const [currentPage, setCurrentPage] = useState(startPage);
@@ -203,14 +210,26 @@ export default function JournalBookScreen() {
     [],
   );
 
+  const handleConfirmDelete = useCallback(async () => {
+    if (!pendingDeleteId) return;
+    await deleteEntry(pendingDeleteId);
+    setPersisted((prev) => prev.filter((e) => e.id !== pendingDeleteId));
+    setPendingDeleteId(null);
+  }, [pendingDeleteId]);
+
   const renderItem = useCallback(
-    ({ item, index }: ListRenderItemInfo<Entry>) => (
-      <PageFlipItem item={item} index={index} scrollX={scrollX} />
+    ({ item, index }: ListRenderItemInfo<JournalEntry>) => (
+      <PageFlipItem
+        item={item}
+        index={index}
+        scrollX={scrollX}
+        onLongPress={() => setPendingDeleteId(item.id)}
+      />
     ),
     [scrollX],
   );
 
-  const keyExtractor = useCallback((item: Entry) => item.id, []);
+  const keyExtractor = useCallback((item: JournalEntry) => item.id, []);
 
   return (
     <View style={styles.container}>
@@ -231,6 +250,28 @@ export default function JournalBookScreen() {
         })}
         contentContainerStyle={styles.listContent}
       />
+
+      {pendingDeleteId && (
+        <View style={styles.deleteBanner}>
+          <Text style={styles.deleteBannerText}>Delete this page?</Text>
+          <View style={styles.deleteBannerActions}>
+            <TouchableOpacity
+              style={styles.deleteCancelButton}
+              activeOpacity={0.7}
+              onPress={() => setPendingDeleteId(null)}
+            >
+              <Text style={styles.deleteCancelText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.deleteConfirmButton}
+              activeOpacity={0.7}
+              onPress={handleConfirmDelete}
+            >
+              <Text style={styles.deleteConfirmText}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
 
       <View style={styles.folioBar}>
         <View style={styles.folioDivider} />
@@ -255,8 +296,9 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.base },
   listContent: { paddingTop: 20, paddingBottom: 8, paddingHorizontal: 20 },
   pageWrapper: { width: PAGE_W, height: '100%', justifyContent: 'center', alignItems: 'center' },
+  pageTouchable: { width: PAGE_W - 16, height: '92%' },
   pageContainer: {
-    width: PAGE_W - 16, height: '92%',
+    flex: 1,
     shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, elevation: 5,
   },
   diaryPage: { flex: 1 },
@@ -270,6 +312,24 @@ const styles = StyleSheet.create({
   folioBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 10, gap: 16 },
   folioDivider: { width: 32, height: 1, backgroundColor: 'rgba(74,74,74,0.15)' },
   folioText: { fontFamily: fonts.ui, fontSize: 12, color: colors.textLight, letterSpacing: 2 },
+  deleteBanner: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    marginHorizontal: 20, marginBottom: 8, paddingVertical: 10, paddingHorizontal: 16,
+    borderRadius: 12, backgroundColor: colors.white,
+    borderWidth: StyleSheet.hairlineWidth, borderColor: 'rgba(224,93,93,0.35)',
+  },
+  deleteBannerText: { fontFamily: fonts.uiSemiBold, fontSize: 13, color: colors.text },
+  deleteBannerActions: { flexDirection: 'row', gap: 10 },
+  deleteCancelButton: {
+    paddingVertical: 6, paddingHorizontal: 14, borderRadius: 14,
+    backgroundColor: colors.overlay,
+  },
+  deleteCancelText: { fontFamily: fonts.uiSemiBold, fontSize: 12, color: colors.textLight },
+  deleteConfirmButton: {
+    paddingVertical: 6, paddingHorizontal: 14, borderRadius: 14,
+    backgroundColor: '#E05D5D',
+  },
+  deleteConfirmText: { fontFamily: fonts.uiSemiBold, fontSize: 12, color: colors.white },
   newEntryPill: {
     alignSelf: 'center', marginBottom: 20, paddingVertical: 10, paddingHorizontal: 24,
     borderRadius: 20, backgroundColor: colors.accent,

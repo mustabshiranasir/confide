@@ -21,11 +21,11 @@ import StickerCanvas from '../components/Sticker/StickerCanvas';
 import StickerToolbar from '../components/Sticker/StickerToolbar';
 import { PlacedSticker, Sticker } from '../types/sticker';
 import { useStickerHistory } from '../hooks/useStickerHistory';
-import { saveEntry } from '../data/journalStore';
+import { saveEntry } from '../storage/journalStorage';
 
 type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: { page: number; newEntry?: { id: string; text: string; date: string; stickers?: PlacedSticker[]; background?: PaperStyle } };
+  JournalBook: { page: number; newEntry?: { id: string; text: string; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; background?: PaperStyle } };
   NewEntry: undefined;
 };
 
@@ -119,7 +119,7 @@ export default function NewEntryScreen() {
   const [contentHeight, setContentHeight] = useState(INITIAL_HEIGHT);
   const [isBgPickerOpen, setIsBgPickerOpen] = useState(false);
   const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false);
-  const [paperStyle, setPaperStyle] = useState<PaperStyle>('custom');
+  const [paperStyle, setPaperStyle] = useState<PaperStyle>('white');
   const [activeStickerId, setActiveStickerId] = useState<string | null>(null);
   const textRef = useRef<TextInput>(null);
 
@@ -151,12 +151,18 @@ export default function NewEntryScreen() {
     [],
   );
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const trimmed = text.trim();
     if (!trimmed && placedStickers.length === 0) return;
     const id = `entry-${Date.now()}`;
-    const entry = { id, text: trimmed, date: today, stickers: placedStickers, background: paperStyle };
-    saveEntry(entry);
+    const entry = {
+      id,
+      text: trimmed,
+      date: today,
+      background: paperStyle,
+      decorations: placedStickers,
+    };
+    await saveEntry(entry);
     navigation.navigate('JournalBook', {
       page: 0,
       newEntry: entry,

@@ -15,6 +15,7 @@ type RootStackParamList = {
   BookShelf: undefined;
   JournalBook: { page: number };
   NewEntry: undefined;
+  DebugStorage: undefined;
 };
 
 const LEATHER_BASE = '#6B3A2A';
@@ -86,7 +87,9 @@ export default function BookShelfScreen() {
       <View style={styles.shelfArea}>
         <TouchableOpacity
           activeOpacity={0.9}
+          delayLongPress={600}
           onPress={() => navigation.navigate('JournalBook', { page: 0 })}
+          onLongPress={() => navigation.navigate('DebugStorage')}
         >
           <BookCover />
         </TouchableOpacity>
