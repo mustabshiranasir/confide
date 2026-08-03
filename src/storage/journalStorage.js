@@ -1,37 +1,66 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
+import * as SQLite from 'expo-sqlite';
 import CryptoJS from 'crypto-js';
 import { Platform } from 'react-native';
 
-const ENTRY_PREFIX = 'entry_';
-const INDEX_KEY = 'entry_index';
+const DB_NAME = 'confide.db';
+const LEGACY_ENTRY_PREFIX = 'entry_';
+const LEGACY_INDEX_KEY = 'entry_index';
+const MIGRATION_MARKER_KEY = 'confide.migration.sqlite.v1';
 const SECURE_KEY_NAME = 'confide.encryption.key';
 const WEB_KEY_NAME = 'confide.encryption.key.web';
 
 let cachedKey = null;
+let dbPromise = null;
 
 function sortByDateDesc(items) {
   return [...items].sort((a, b) => new Date(b.date) - new Date(a.date));
 }
 
-function upsertIndex(index, id, date) {
-  return sortByDateDesc([...index.filter((item) => item.id !== id), { id, date }]);
-}
-
-async function readIndex() {
+async function migrateLegacyData(db) {
   try {
-    const raw = await AsyncStorage.getItem(INDEX_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    const marker = await AsyncStorage.getItem(MIGRATION_MARKER_KEY);
+    if (marker) return;
+    const indexRaw = await AsyncStorage.getItem(LEGACY_INDEX_KEY);
+    if (indexRaw) {
+      const index = JSON.parse(indexRaw);
+      if (Array.isArray(index)) {
+        const createdAt = new Date().toISOString();
+        for (const item of index) {
+          const raw = await AsyncStorage.getItem(`${LEGACY_ENTRY_PREFIX}${item.id}`);
+          if (raw && item.id && item.date) {
+            await db.runAsync(
+              'INSERT OR IGNORE INTO entries (id, date, encrypted_payload, created_at) VALUES (?, ?, ?, ?)',
+              [item.id, item.date, raw, createdAt],
+            );
+          }
+        }
+      }
+    }
+    await AsyncStorage.setItem(MIGRATION_MARKER_KEY, 'true');
   } catch (error) {
-    console.error('[journalStorage] readIndex failed', error);
-    return [];
+    console.error('[journalStorage] migrateLegacyData failed', error);
   }
 }
 
-async function writeIndex(index) {
-  await AsyncStorage.setItem(INDEX_KEY, JSON.stringify(index));
+export async function getDatabase() {
+  if (!dbPromise) {
+    dbPromise = (async () => {
+      const db = await SQLite.openDatabaseAsync(DB_NAME);
+      await db.execAsync(`
+        CREATE TABLE IF NOT EXISTS entries (
+          id TEXT PRIMARY KEY NOT NULL,
+          date TEXT NOT NULL,
+          encrypted_payload TEXT NOT NULL,
+          created_at TEXT NOT NULL
+        );
+      `);
+      await migrateLegacyData(db);
+      return db;
+    })();
+  }
+  return dbPromise;
 }
 
 async function secureGet() {
@@ -84,11 +113,17 @@ export async function initEncryptionKey() {
 
 export async function saveEntry(entry) {
   try {
+    const db = await getDatabase();
     const key = await getKey();
     const encrypted = encrypt(JSON.stringify(entry), key);
-    await AsyncStorage.setItem(`${ENTRY_PREFIX}${entry.id}`, encrypted);
-    const index = await readIndex();
-    await writeIndex(upsertIndex(index, entry.id, entry.date));
+    await db.runAsync(
+      `INSERT INTO entries (id, date, encrypted_payload, created_at)
+       VALUES (?, ?, ?, ?)
+       ON CONFLICT(id) DO UPDATE SET
+         date = excluded.date,
+         encrypted_payload = excluded.encrypted_payload`,
+      [entry.id, entry.date, encrypted, new Date().toISOString()],
+    );
   } catch (error) {
     console.error('[journalStorage] saveEntry failed', entry && entry.id, error);
   }
@@ -96,10 +131,14 @@ export async function saveEntry(entry) {
 
 export async function getEntry(id) {
   try {
+    const db = await getDatabase();
+    const row = await db.getFirstAsync(
+      'SELECT encrypted_payload FROM entries WHERE id = ?',
+      [id],
+    );
+    if (!row) return null;
     const key = await getKey();
-    const raw = await AsyncStorage.getItem(`${ENTRY_PREFIX}${id}`);
-    if (!raw) return null;
-    const plaintext = decrypt(raw, key);
+    const plaintext = decrypt(row.encrypted_payload, key);
     if (!plaintext) return null;
     return JSON.parse(plaintext);
   } catch (error) {
@@ -110,12 +149,36 @@ export async function getEntry(id) {
 
 export async function getAllEntries() {
   try {
-    const index = await readIndex();
-    const entries = await Promise.all(index.map((item) => getEntry(item.id)));
-    return sortByDateDesc(entries.filter(Boolean));
+    const db = await getDatabase();
+    const key = await getKey();
+    const rows = await db.getAllAsync(
+      'SELECT id, encrypted_payload FROM entries',
+    );
+    const entries = [];
+    for (const row of rows) {
+      try {
+        const plaintext = decrypt(row.encrypted_payload, key);
+        if (!plaintext) continue;
+        entries.push(JSON.parse(plaintext));
+      } catch (error) {
+        console.error('[journalStorage] getAllEntries failed for', row.id, error);
+      }
+    }
+    return sortByDateDesc(entries);
   } catch (error) {
     console.error('[journalStorage] getAllEntries failed', error);
     return [];
+  }
+}
+
+export async function decryptString(ciphertext) {
+  try {
+    if (!ciphertext) return '';
+    const key = await getKey();
+    return decrypt(ciphertext, key);
+  } catch (error) {
+    console.error('[journalStorage] decryptString failed', error);
+    return '';
   }
 }
 
@@ -124,7 +187,13 @@ export async function updateEntry(id, updates) {
     const current = await getEntry(id);
     if (!current) return null;
     const merged = { ...current, ...updates, id };
-    await saveEntry(merged);
+    const db = await getDatabase();
+    const key = await getKey();
+    const encrypted = encrypt(JSON.stringify(merged), key);
+    await db.runAsync(
+      'UPDATE entries SET date = ?, encrypted_payload = ? WHERE id = ?',
+      [merged.date, encrypted, id],
+    );
     return merged;
   } catch (error) {
     console.error('[journalStorage] updateEntry failed', id, error);
@@ -134,9 +203,8 @@ export async function updateEntry(id, updates) {
 
 export async function deleteEntry(id) {
   try {
-    await AsyncStorage.removeItem(`${ENTRY_PREFIX}${id}`);
-    const index = await readIndex();
-    await writeIndex(index.filter((item) => item.id !== id));
+    const db = await getDatabase();
+    await db.runAsync('DELETE FROM entries WHERE id = ?', [id]);
   } catch (error) {
     console.error('[journalStorage] deleteEntry failed', id, error);
   }
