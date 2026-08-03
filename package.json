@@ -11,7 +11,8 @@
     "export:web": "expo export --platform web",
     "vercel-build": "npm run export:web",
     "lint": "expo lint",
-    "stickers:sync": "node scripts/sync-stickers.mjs"
+    "stickers:sync": "node scripts/sync-stickers.mjs",
+    "stickers:slice": "node scripts/slice-washi.mjs"
   },
   "dependencies": {
     "@expo-google-fonts/caveat": "^0.2.3",
@@ -19,8 +20,10 @@
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-navigation/native": "^7.1.6",
     "@react-navigation/stack": "^7.3.2",
+    "crypto-js": "^4.2.0",
     "expo": "~56.0.17",
     "expo-font": "~56.0.7",
+    "expo-secure-store": "~56.0.4",
     "expo-splash-screen": "~56.0.14",
     "expo-status-bar": "~56.0.4",
     "react": "19.2.3",
