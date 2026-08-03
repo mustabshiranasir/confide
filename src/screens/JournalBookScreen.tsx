@@ -262,7 +262,9 @@ export default function JournalBookScreen() {
           })}
           contentContainerStyle={styles.listContent}
         />
+      </ScrollView>
 
+      <View style={styles.bottomBar}>
         {pendingDeleteId && (
           <View style={styles.deleteBanner}>
             <Text style={styles.deleteBannerText}>Delete this page?</Text>
@@ -312,7 +314,7 @@ export default function JournalBookScreen() {
         >
           <Text style={styles.newEntryPillText}>+ New Entry</Text>
         </TouchableOpacity>
-      </ScrollView>
+      </View>
     </View>
   );
 }
@@ -321,6 +323,12 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.base },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 28 },
+  bottomBar: {
+    backgroundColor: colors.base,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: 'rgba(74,74,74,0.08)',
+    paddingTop: 4,
+  },
   list: { height: LIST_H },
   listContent: { paddingTop: 20, paddingBottom: 8, paddingHorizontal: 20 },
   pageWrapper: { width: PAGE_W, height: PAGE_H, justifyContent: 'center', alignItems: 'center' },
