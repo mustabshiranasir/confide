@@ -10,7 +10,7 @@ import {
     StyleSheet,
     Text,
     TouchableOpacity,
-    View
+    View,
 } from 'react-native';
 import Animated, {
     Extrapolation,
