@@ -8,6 +8,7 @@ import {
   FlatList,
   ListRenderItemInfo,
   Image,
+  ScrollView,
 } from 'react-native';
 import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -43,6 +44,8 @@ interface JournalEntry {
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const PAGE_W = SCREEN_W - 40;
+const PAGE_H = Math.round((PAGE_W - 16) * (4 / 3));
+const LIST_H = PAGE_H + 28;
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList<JournalEntry>);
 
 const SAMPLE_ENTRIES: JournalEntry[] = [
@@ -236,82 +239,92 @@ export default function JournalBookScreen() {
 
   return (
     <View style={styles.container}>
-      <AnimatedFlatList
-        data={entries}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={onScroll}
-        onMomentumScrollEnd={onMomentumEnd}
-        initialScrollIndex={startPage}
-        getItemLayout={(_, index) => ({
-          length: PAGE_W,
-          offset: PAGE_W * index,
-          index: index as number,
-        })}
-        contentContainerStyle={styles.listContent}
-      />
-
-      {pendingDeleteId && (
-        <View style={styles.deleteBanner}>
-          <Text style={styles.deleteBannerText}>Delete this page?</Text>
-          <View style={styles.deleteBannerActions}>
-            <TouchableOpacity
-              style={styles.deleteCancelButton}
-              activeOpacity={0.7}
-              onPress={() => setPendingDeleteId(null)}
-            >
-              <Text style={styles.deleteCancelText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.deleteConfirmButton}
-              activeOpacity={0.7}
-              onPress={handleConfirmDelete}
-            >
-              <Text style={styles.deleteConfirmText}>Delete</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
-
-      <View style={styles.folioBar}>
-        <TouchableOpacity
-          style={styles.folioDeleteButton}
-          activeOpacity={0.7}
-          onPress={() => {
-            const page = Math.min(currentPage, entries.length - 1);
-            const current = entries[page];
-            if (current) setPendingDeleteId(current.id);
-          }}
-        >
-          <Text style={styles.folioDeleteText}>Delete page</Text>
-        </TouchableOpacity>
-        <View style={styles.folioDivider} />
-        <Text style={styles.folioText}>
-          {Math.min(currentPage, Math.max(entries.length - 1, 0)) + 1} {'\u2014'} {entries.length}
-        </Text>
-        <View style={styles.folioDivider} />
-        <View style={styles.folioSpacer} />
-      </View>
-
-      <TouchableOpacity
-        style={styles.newEntryPill}
-        activeOpacity={0.7}
-        onPress={() => navigation.navigate('NewEntry')}
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator
       >
-        <Text style={styles.newEntryPillText}>+ New Entry</Text>
-      </TouchableOpacity>
+        <AnimatedFlatList
+          style={styles.list}
+          data={entries}
+          renderItem={renderItem}
+          keyExtractor={keyExtractor}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onScroll={onScroll}
+          onMomentumScrollEnd={onMomentumEnd}
+          initialScrollIndex={startPage}
+          getItemLayout={(_, index) => ({
+            length: PAGE_W,
+            offset: PAGE_W * index,
+            index: index as number,
+          })}
+          contentContainerStyle={styles.listContent}
+        />
+
+        {pendingDeleteId && (
+          <View style={styles.deleteBanner}>
+            <Text style={styles.deleteBannerText}>Delete this page?</Text>
+            <View style={styles.deleteBannerActions}>
+              <TouchableOpacity
+                style={styles.deleteCancelButton}
+                activeOpacity={0.7}
+                onPress={() => setPendingDeleteId(null)}
+              >
+                <Text style={styles.deleteCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteConfirmButton}
+                activeOpacity={0.7}
+                onPress={handleConfirmDelete}
+              >
+                <Text style={styles.deleteConfirmText}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
+        <View style={styles.folioBar}>
+          <TouchableOpacity
+            style={styles.folioDeleteButton}
+            activeOpacity={0.7}
+            onPress={() => {
+              const page = Math.min(currentPage, entries.length - 1);
+              const current = entries[page];
+              if (current) setPendingDeleteId(current.id);
+            }}
+          >
+            <Text style={styles.folioDeleteText}>Delete page</Text>
+          </TouchableOpacity>
+          <View style={styles.folioDivider} />
+          <Text style={styles.folioText}>
+            {Math.min(currentPage, Math.max(entries.length - 1, 0)) + 1} {'\u2014'} {entries.length}
+          </Text>
+          <View style={styles.folioDivider} />
+          <View style={styles.folioSpacer} />
+        </View>
+
+        <TouchableOpacity
+          style={styles.newEntryPill}
+          activeOpacity={0.7}
+          onPress={() => navigation.navigate('NewEntry')}
+        >
+          <Text style={styles.newEntryPillText}>+ New Entry</Text>
+        </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.base },
+  scroll: { flex: 1 },
+  scrollContent: { paddingBottom: 28 },
+  list: { height: LIST_H },
   listContent: { paddingTop: 20, paddingBottom: 8, paddingHorizontal: 20 },
-  pageWrapper: { width: PAGE_W, height: '100%', justifyContent: 'center', alignItems: 'center' },
-  pageTouchable: { width: PAGE_W - 16, height: '92%' },
+  pageWrapper: { width: PAGE_W, height: PAGE_H, justifyContent: 'center', alignItems: 'center' },
+  pageTouchable: { width: PAGE_W - 16, height: '100%' },
   pageContainer: {
     flex: 1,
     shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, elevation: 5,
