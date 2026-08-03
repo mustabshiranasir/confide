@@ -1,31 +1,31 @@
-import React, { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions,
-  FlatList,
-  ListRenderItemInfo,
-  Image,
-  ScrollView,
-} from 'react-native';
-import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
+import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import React, { useCallback, useState } from 'react';
+import {
+    Dimensions,
+    FlatList,
+    Image,
+    ListRenderItemInfo,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from 'react-native';
 import Animated, {
-  useSharedValue,
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  interpolate,
-  Extrapolation,
-  SharedValue,
+    Extrapolation,
+    interpolate,
+    SharedValue,
+    useAnimatedScrollHandler,
+    useAnimatedStyle,
+    useSharedValue,
 } from 'react-native-reanimated';
+import JournalPage, { getPaperInk, PaperStyle } from '../components/JournalPage';
+import { getStickerSource } from '../data/stickers';
+import { deleteEntry, getAllEntries } from '../storage/journalStorage';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
-import JournalPage, { getPaperInk, PaperStyle } from '../components/JournalPage';
 import { PlacedSticker } from '../types/sticker';
-import { getStickerSource } from '../data/stickers';
-import { getAllEntries, deleteEntry } from '../storage/journalStorage';
 
 type RootStackParamList = {
   BookShelf: undefined;
@@ -43,38 +43,19 @@ interface JournalEntry {
 }
 
 const { width: SCREEN_W } = Dimensions.get('window');
-const PAGE_W = SCREEN_W - 40;
-const PAGE_H = Math.round((PAGE_W - 16) * (4 / 3));
+const ITEM_W = SCREEN_W;
+const MAX_PAGE_W = 460;
+const pageWidth = Math.min(SCREEN_W - 24, MAX_PAGE_W);
+const PAGE_H = Math.round(pageWidth * (4 / 3));
 const LIST_H = PAGE_H + 28;
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList<JournalEntry>);
 
-const SAMPLE_ENTRIES: JournalEntry[] = [
-  {
-    id: '1',
-    date: 'July 27, 2026',
-    text: 'Today was a beautiful day. I sat by the window and watched the rain, and it felt like the world was whispering secrets just for me...',
-  },
-  {
-    id: '2',
-    date: 'July 26, 2026',
-    text: 'I started a new project today. The blank canvas excites me more than it should. There is something magical about beginnings.',
-  },
-  {
-    id: '3',
-    date: 'July 25, 2026',
-    text: 'Spent the evening rearranging my bookshelf. Each book is a memory, a phase of life. I kept running into old friends on the shelves.',
-  },
-  {
-    id: '4',
-    date: 'July 24, 2026',
-    text: 'Made lemon tea and watched the sunset through the kitchen window. Sometimes the simplest moments hold the most warmth.',
-  },
-  {
-    id: '5',
-    date: 'July 23, 2026',
-    text: 'Found an old photograph tucked inside a book today. It was from a trip I had almost forgotten. Memories have a way of finding us when we need them.',
-  },
-];
+const EMPTY_PAGES: JournalEntry[] = Array.from({ length: 5 }).map((_, i) => ({
+  id: `blank-${i}`,
+  date: '',
+  text: '',
+  background: 'white',
+}));
 
 function PageFlipItem({
   item,
@@ -88,9 +69,9 @@ function PageFlipItem({
   onLongPress: () => void;
 }) {
   const animatedStyle = useAnimatedStyle(() => {
-    const pageOffset = index * PAGE_W;
+    const pageOffset = index * ITEM_W;
     const diff = scrollX.value - pageOffset;
-    const normalized = diff / PAGE_W;
+    const normalized = diff / ITEM_W;
 
     const rotateY = interpolate(
       normalized,
@@ -125,11 +106,15 @@ function PageFlipItem({
         style={styles.pageTouchable}
       >
         <Animated.View style={[styles.pageContainer, animatedStyle]}>
-          <JournalPage background={item.background ?? 'custom'} style={styles.diaryPage}>
-            <View style={styles.tapeStrip} />
-            <Text style={styles.dateText}>{item.date}</Text>
-            <View style={styles.dateUnderline} />
-            <Text style={[styles.entryText, { color: getPaperInk(item.background ?? 'custom') }]}>{item.text}</Text>
+          <JournalPage background={item.background ?? 'custom'} style={styles.diaryPage} scrollable>
+            {item.text ? (
+              <>
+                <View style={styles.tapeStrip} />
+                <Text style={styles.dateText}>{item.date}</Text>
+                <View style={styles.dateUnderline} />
+                <Text style={[styles.entryText, { color: getPaperInk(item.background ?? 'custom') }]}>{item.text}</Text>
+              </>
+            ) : null}
 
             {placedStickers?.map((sticker) => {
             const source = getStickerSource(sticker.stickerId);
@@ -196,12 +181,12 @@ export default function JournalBookScreen() {
       seen.add(e.id);
       return true;
     });
-    const samples = SAMPLE_ENTRIES.filter((s) => !removedSampleIds.includes(s.id));
+    const samples = EMPTY_PAGES.filter((s) => !removedSampleIds.includes(s.id));
     return deduped.length > 0 ? deduped : samples;
   }, [loaded, persisted, newEntryParam, removedSampleIds]);
 
   const [currentPage, setCurrentPage] = useState(startPage);
-  const scrollX = useSharedValue(startPage * PAGE_W);
+  const scrollX = useSharedValue(startPage * ITEM_W);
 
   const onScroll = useAnimatedScrollHandler({
     onScroll: (e) => { scrollX.value = e.contentOffset.x; },
@@ -209,7 +194,7 @@ export default function JournalBookScreen() {
 
   const onMomentumEnd = useCallback(
     (e: { nativeEvent: { contentOffset: { x: number } } }) => {
-      const page = Math.round(e.nativeEvent.contentOffset.x / PAGE_W);
+      const page = Math.round(e.nativeEvent.contentOffset.x / ITEM_W);
       setCurrentPage(page);
     },
     [],
@@ -256,8 +241,8 @@ export default function JournalBookScreen() {
           onMomentumScrollEnd={onMomentumEnd}
           initialScrollIndex={startPage}
           getItemLayout={(_, index) => ({
-            length: PAGE_W,
-            offset: PAGE_W * index,
+            length: ITEM_W,
+            offset: ITEM_W * index,
             index: index as number,
           })}
           contentContainerStyle={styles.listContent}
@@ -322,14 +307,17 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 28 },
   list: { height: LIST_H },
-  listContent: { paddingTop: 20, paddingBottom: 8, paddingHorizontal: 20 },
-  pageWrapper: { width: PAGE_W, height: PAGE_H, justifyContent: 'center', alignItems: 'center' },
-  pageTouchable: { width: PAGE_W - 16, height: '100%' },
+  listContent: { paddingTop: 20, paddingBottom: 8 },
+  pageWrapper: { width: ITEM_W, height: '100%', justifyContent: 'center', alignItems: 'center' },
+  pageTouchable: { width: '100%', height: '100%' },
   pageContainer: {
     flex: 1,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
     shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, elevation: 5,
   },
-  diaryPage: { flex: 1 },
+  diaryPage: { width: '100%', maxWidth: MAX_PAGE_W, aspectRatio: 3 / 4 },
   tapeStrip: {
     position: 'absolute', top: 8, right: 16, width: 56, height: 16,
     backgroundColor: 'rgba(183,196,168,0.4)', borderRadius: 2, transform: [{ rotate: '12deg' }],
