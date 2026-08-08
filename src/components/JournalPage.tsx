@@ -1,5 +1,5 @@
 import React from 'react';
-import { ImageBackground, ScrollView, StyleSheet, View, ViewStyle } from 'react-native';
+import { ImageBackground, StyleSheet, View, ViewStyle } from 'react-native';
 import Svg, { Circle, G, Path } from 'react-native-svg';
 import { colors } from '../theme/colors';
 
@@ -43,7 +43,6 @@ interface JournalPageProps {
   children?: React.ReactNode;
   style?: ViewStyle;
   contentPadding?: boolean;
-  scrollable?: boolean;
 }
 
 const LINE_SPACING = 28;
@@ -330,29 +329,7 @@ export default function JournalPage({
   children,
   style,
   contentPadding = true,
-  scrollable = false,
 }: JournalPageProps) {
-  const content = scrollable ? (
-    <ScrollView
-      style={styles.contentArea}
-      contentContainerStyle={[styles.contentScrollContent, contentPadding && styles.contentPadding]}
-      showsVerticalScrollIndicator={false}
-      bounces={false}
-      nestedScrollEnabled
-    >
-      {children}
-    </ScrollView>
-  ) : (
-    <View
-      style={[
-        styles.contentArea,
-        contentPadding && styles.contentPadding,
-      ]}
-    >
-      {children}
-    </View>
-  );
-
   return (
     <View style={[styles.outerShadow, style]}>
       <View style={[styles.page, background === 'dark' && styles.pageDark]}>
@@ -379,7 +356,14 @@ export default function JournalPage({
 
         <TornEdge dark={background === 'dark'} />
 
-        {content}
+        <View
+          style={[
+            styles.contentArea,
+            contentPadding && styles.contentPadding,
+          ]}
+        >
+          {children}
+        </View>
       </View>
     </View>
   );
@@ -563,13 +547,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-  },
-  contentScrollContent: {
-    flexGrow: 1,
-    paddingTop: 24,
-    paddingBottom: 20,
-    paddingLeft: 44,
-    paddingRight: 20,
   },
   contentPadding: {
     paddingTop: 24,

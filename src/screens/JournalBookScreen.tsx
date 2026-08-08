@@ -106,7 +106,7 @@ function PageFlipItem({
         style={styles.pageTouchable}
       >
         <Animated.View style={[styles.pageContainer, animatedStyle]}>
-          <JournalPage background={item.background ?? 'custom'} style={styles.diaryPage} scrollable>
+          <JournalPage background={item.background ?? 'custom'} style={styles.diaryPage}>
             {item.text ? (
               <>
                 <View style={styles.tapeStrip} />
