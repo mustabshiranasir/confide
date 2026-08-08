@@ -9,7 +9,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "export:web": "expo export --platform web",
-    "vercel-build": "npm run export:web",
+    "vercel-build": "node scripts/vercel-build.mjs",
     "lint": "expo lint",
     "stickers:sync": "node scripts/sync-stickers.mjs",
     "stickers:slice": "node scripts/slice-washi.mjs"

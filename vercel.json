@@ -1,16 +1,4 @@
 {
   "buildCommand": "npm run vercel-build",
-  "outputDirectory": "dist",
-  "images": {
-    "sizes": [160, 320, 640, 1280],
-    "qualities": [75, 80, 90],
-    "localPatterns": [
-      { "pathname": "^/assets/.*$", "search": "" }
-    ],
-    "formats": ["image/webp", "image/avif"],
-    "minimumCacheTTL": 300
-  },
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "outputDirectory": ".vercel/output"
 }
