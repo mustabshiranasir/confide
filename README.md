@@ -10,6 +10,17 @@ Confide is a cross-platform mobile journaling app built with React Native (Expo)
 - **Page-turn animation** — 3D page-flip effect between diary pages
 - **Decorative details** — washi tape strips, ruled date lines, book-spine shelf display
 
+### Text Customization
+- **Entry titles** — optional title field with its own heading placeholder and independent font styling
+- **Per-chunk text styling** — the Font Panel applies styles only to the text you select (stored as styled ranges), so a single page can mix fonts, colors, and decorations; typing continues in the base style
+- **19 font families** across 10 categories (serif, sans, handwritten, cursive, script, typewriter, modern, minimalist, decorative, playful)
+- **Size presets + slider** — 8–72px
+- **Style toggles** — bold, italic, underline, strikethrough, highlight, uppercase / lowercase
+- **Letter spacing, line height & alignment** controls
+- **Color picker** — palette, pastel, dark, gradient, and custom HEX
+- **Live overlay preview** — styled chunks render behind the text input as you write
+- **Gradient text rendering** — SVG-based gradient fill for whole-page gradient styles
+
 ### Sticker System
 - **4 sticker packs** (~172 stickers): flowers, kawaii, stamps, and washi tape
 - **Full sticker manipulation** on the writing canvas:
@@ -31,6 +42,7 @@ Confide is a cross-platform mobile journaling app built with React Native (Expo)
 - **Auto-refresh** — JournalBook reloads encrypted entries on every focus
 - **One-time migration** — legacy AsyncStorage entries (`entry_<id>` + `entry_index`) are imported into SQLite on first run, guarded by a migration marker
 - **13 page backgrounds** — custom, white, lined, dots, graph, kraft, vintage, marble, floral, watercolor, dark, gradient, fabric
+- **On-device persistence** — every entry (including its title, per-chunk text style ranges, stickers, and background) is saved locally in encrypted form
 
 ### Hidden Debug Screen
 - **Storage Debug** — long-press the book cover on the home screen
@@ -41,13 +53,13 @@ Confide is a cross-platform mobile journaling app built with React Native (Expo)
 - React Native 0.85 + Expo SDK 56
 - TypeScript
 - React Navigation (Stack Navigator)
-- Expo Font + Google Fonts (Caveat, Inter)
+- Expo Font + Google Fonts (Caveat, Inter + 17 more font families for the text panel)
 - `expo-sqlite` — on-device SQLite database
 - `crypto-js` — AES encryption
 - `expo-secure-store` — encryption key storage
 - `react-native-reanimated` — page-turn & gesture animations
 - `react-native-gesture-handler` — sticker drag / rotate gestures
-- `react-native-svg` — decorative vector icons & backgrounds
+- `react-native-svg` — decorative vector icons, backgrounds & gradient text
 
 ## Getting Started
 
@@ -75,7 +87,7 @@ npm run stickers:slice
 
 | Location | Content |
 | --- | --- |
-| `confide.db` → `entries` table | Every diary entry with columns: `id` (TEXT PRIMARY KEY), `date`, `encrypted_payload` (AES-encrypted JSON of `{ id, date, text, background, decorations }`), `created_at` |
+| `confide.db` → `entries` table | Every diary entry with columns: `id` (TEXT PRIMARY KEY), `date`, `encrypted_payload` (AES-encrypted JSON of `{ id, date, text, title, titleStyle, background, decorations, textStyle, ranges }`), `created_at` |
 | `confide.encryption.key.web` (AsyncStorage) | Web-only fallback for the AES key (native uses expo-secure-store) |
 | `confide.migration.sqlite.v1` (AsyncStorage) | One-time marker that legacy `entry_<id>` / `entry_index` data has been migrated to SQLite |
 
@@ -90,33 +102,38 @@ scripts/
   slice-washi.mjs                       # Auto-slices washi sprite sheets into stickers
 assets/stickers/
   flowers/ kawaii/ stamps/ washi/       # Sticker packs (washi/ also holds raw newpack*.png sheets)
-src/
-  theme/
-    colors.ts                           # Color palette constants
-    fonts.ts                            # Font family name constants
-  navigation/
-    StackNavigator.tsx                  # BookShelf, JournalBook, NewEntry, DebugStorage
-  screens/
-    BookShelfScreen.tsx                 # Home — journal shelf, hidden debug entry point
-    JournalBookScreen.tsx               # Page-turn diary, loads encrypted entries, long-press delete
-    NewEntryScreen.tsx                  # Writing canvas (text + stickers + background)
-    DebugStorageScreen.tsx              # Encrypted-vs-decrypted storage inspector
-  components/
-    JournalPage.tsx                     # Paper-style page rendering
-    BackgroundPicker.tsx                # 13 background options
-    Sticker/                            # Picker, canvas, item, toolbar, category components
-  data/
-    stickers.json                       # Sticker catalog (generated)
-    stickerAssets.ts                    # Static require map (generated)
-    stickers.ts                         # Category/source lookup
-    stickerPrefs.ts                     # Favorites & recents
-    journalStore.ts                     # Legacy plaintext store (superseded)
-  storage/
-    journalStorage.js                   # AES-encrypted SQLite CRUD + key management + legacy migration
-  hooks/
-    useStickerHistory.ts                # Undo/redo for sticker placements
-  types/
-    sticker.ts                          # PlacedSticker / Sticker types
+  src/
+    theme/
+      colors.ts                           # Color palette constants
+      fonts.ts                            # Font family name constants
+      fontStyles.ts                       # Font catalog, palettes, style resolution, text wrapping/segments
+    navigation/
+      StackNavigator.tsx                  # BookShelf, JournalBook, NewEntry, DebugStorage
+    screens/
+      BookShelfScreen.tsx                 # Home — journal shelf, hidden debug entry point
+      JournalBookScreen.tsx               # Page-turn diary, loads encrypted entries, long-press delete
+      NewEntryScreen.tsx                  # Writing canvas (title + text + stickers + background + font panel)
+      DebugStorageScreen.tsx              # Encrypted-vs-decrypted storage inspector
+    components/
+      JournalPage.tsx                     # Paper-style page rendering
+      BackgroundPicker.tsx                # 13 background options
+      FontPanel.tsx                       # Text customization sheet (fonts, size, style, color)
+      GradientPageText.tsx                # SVG gradient text rendering
+      StyledEntryText.tsx                 # Renders text with per-chunk style ranges
+      Sticker/                            # Picker, canvas, item, toolbar, category components
+    data/
+      stickers.json                       # Sticker catalog (generated)
+      stickerAssets.ts                    # Static require map (generated)
+      stickers.ts                         # Category/source lookup
+      stickerPrefs.ts                     # Favorites & recents
+      journalStore.ts                     # Legacy plaintext store (superseded)
+    storage/
+      journalStorage.js                   # AES-encrypted SQLite CRUD + key management + legacy migration
+    hooks/
+      useStickerHistory.ts                # Undo/redo for sticker placements
+    types/
+      sticker.ts                          # PlacedSticker / Sticker types
+      textStyle.ts                        # TextStyle model, style ranges, range merge/rebase helpers
 ```
 
 ## License
