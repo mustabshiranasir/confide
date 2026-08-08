@@ -1,16 +1,15 @@
 /**
- * Sticker optimizer.
+ * Sticker optimizer (non-destructive).
  *
  * Post-processes every sliced sticker in assets/stickers/<category>/*.png:
  *   1. Trims transparent padding down to a small border so each sticker
  *      fills more of its preview cell and looks larger / cleaner.
  *   2. Removes the faint semi-transparent halo left over from the original
  *      sheets (alpha < ALPHA_MIN is dropped), giving crisper edges and
- *      much better PNG compression.
- *   3. Downscales stickers that are significantly larger than what the app
- *      actually renders (stickers display at ~80px and rarely beyond ~2x,
- *      so MAX_DIM is plenty). This is the main fix for slow sticker loading
- *      on the web build.
+ *      better PNG compression.
+ *
+ * Note: pixel dimensions are never resized, so stickers keep their exact
+ * original appearance and quality.
  *
  * Output overwrites the input files. Names are unchanged, so the sticker
  * catalog (stickers.json / stickerAssets.ts) does not need to change.
@@ -25,10 +24,6 @@ import { PNG } from 'pngjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ASSETS_DIR = path.join(ROOT, 'assets', 'stickers');
 
-const MAX_DIM = 256;
-// Only downscale when the sticker is at least this many times MAX_DIM,
-// otherwise the resample just softens edges and bloats the PNG.
-const DOWNSCALE_MIN = MAX_DIM * 1.4;
 const ALPHA_MIN = 32;
 const CONTENT_ALPHA = 32;
 const PAD = 2;
@@ -87,60 +82,6 @@ function cleanAlpha(png) {
   }
 }
 
-// Area-average (box) downscale with premultiplied alpha to avoid dark halos.
-function downscale(png, maxDim) {
-  const { width, height, data } = png;
-  const scale = Math.max(width, height) / maxDim;
-  const outW = Math.max(1, Math.round(width / scale));
-  const outH = Math.max(1, Math.round(height / scale));
-
-  const out = new PNG({ width: outW, height: outH });
-  const ksx = width / outW;
-  const ksy = height / outH;
-
-  for (let oy = 0; oy < outH; oy++) {
-    const y0 = oy * ksy;
-    const y1 = (oy + 1) * ksy;
-    const sy0 = Math.floor(y0);
-    const sy1 = Math.min(height - 1, Math.ceil(y1));
-    for (let ox = 0; ox < outW; ox++) {
-      const x0 = ox * ksx;
-      const x1 = (ox + 1) * ksx;
-      const sx0 = Math.floor(x0);
-      const sx1 = Math.min(width - 1, Math.ceil(x1));
-      let aR = 0, aG = 0, aB = 0, aA = 0;
-      for (let syy = sy0; syy <= sy1; syy++) {
-        const wy = Math.min(syy + 1, y1) - Math.max(syy, y0);
-        if (wy <= 0) continue;
-        const base = syy * width;
-        for (let sxx = sx0; sxx <= sx1; sxx++) {
-          const wx = Math.min(sxx + 1, x1) - Math.max(sxx, x0);
-          if (wx <= 0) continue;
-          const w = wx * wy;
-          const s = (base + sxx) * 4;
-          const a = data[s + 3];
-          aR += data[s] * a * w;
-          aG += data[s + 1] * a * w;
-          aB += data[s + 2] * a * w;
-          aA += a * w;
-        }
-      }
-      const area = ksx * ksy;
-      const d = (oy * outW + ox) * 4;
-      if (aA <= 0) {
-        out.data[d + 3] = 0;
-      } else {
-        const inv = 255 / aA;
-        out.data[d] = Math.round(aR / area * inv);
-        out.data[d + 1] = Math.round(aG / area * inv);
-        out.data[d + 2] = Math.round(aB / area * inv);
-        out.data[d + 3] = Math.round(aA / area);
-      }
-    }
-  }
-  return out;
-}
-
 function main() {
   if (!fs.existsSync(ASSETS_DIR)) {
     console.error('missing directory: ' + ASSETS_DIR);
@@ -184,14 +125,8 @@ function main() {
         continue;
       }
 
-      let img = crop(png, bounds);
+      const img = crop(png, bounds);
       cleanAlpha(img);
-
-      const maxDim = Math.max(img.width, img.height);
-      if (maxDim > DOWNSCALE_MIN) {
-        img = downscale(img, MAX_DIM);
-        cleanAlpha(img); // remove fringe reintroduced by the resample
-      }
 
       const after = PNG.sync.write(img).length;
       totalAfter += after;
