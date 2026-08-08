@@ -16,16 +16,19 @@ import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 import JournalPage, { PaperStyle, getPaperInk } from '../components/JournalPage';
 import BackgroundPicker from '../components/BackgroundPicker';
+import FontPanel from '../components/FontPanel';
 import StickerPicker from '../components/Sticker/StickerPicker';
 import StickerCanvas from '../components/Sticker/StickerCanvas';
 import StickerToolbar from '../components/Sticker/StickerToolbar';
 import { PlacedSticker, Sticker } from '../types/sticker';
+import { DEFAULT_TEXT_STYLE, TextStyle } from '../types/textStyle';
+import { resolveTextStyle } from '../theme/fontStyles';
 import { useStickerHistory } from '../hooks/useStickerHistory';
 import { saveEntry } from '../storage/journalStorage';
 
 type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: { page: number; newEntry?: { id: string; text: string; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; background?: PaperStyle } };
+  JournalBook: { page: number; newEntry?: { id: string; text: string; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; background?: PaperStyle; textStyle?: TextStyle } };
   NewEntry: undefined;
 };
 
@@ -81,6 +84,17 @@ function PaletteIcon() {
   );
 }
 
+function TextIcon() {
+  return (
+    <Svg width={24} height={24} viewBox="0 0 24 24">
+      <Path
+        d="M10.6,4.5 L13.4,4.5 L19,20 L16.4,20 L15,15.4 L9,15.4 L7.6,20 L5,20 Z M9.9,13.2 L14.1,13.2 L12,6.9 Z"
+        fill={colors.text}
+      />
+    </Svg>
+  );
+}
+
 function CheckIcon() {
   return (
     <View style={iconStyles.checkOuter}>
@@ -119,7 +133,9 @@ export default function NewEntryScreen() {
   const [contentHeight, setContentHeight] = useState(INITIAL_HEIGHT);
   const [isBgPickerOpen, setIsBgPickerOpen] = useState(false);
   const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false);
+  const [isFontPanelOpen, setIsFontPanelOpen] = useState(false);
   const [paperStyle, setPaperStyle] = useState<PaperStyle>('white');
+  const [textStyle, setTextStyle] = useState<TextStyle>(DEFAULT_TEXT_STYLE);
   const [activeStickerId, setActiveStickerId] = useState<string | null>(null);
   const textRef = useRef<TextInput>(null);
 
@@ -140,6 +156,7 @@ export default function NewEntryScreen() {
 
   const ink = getPaperInk(paperStyle);
   const placeholderInk = ink === colors.text ? 'rgba(74, 74, 74, 0.25)' : `${ink}66`;
+  const resolvedTextStyle = resolveTextStyle(textStyle, ink);
 
   const activeSticker = placedStickers.find((s) => s.id === activeStickerId) ?? null;
   const activeIndex = activeSticker ? placedStickers.indexOf(activeSticker) : -1;
@@ -160,6 +177,7 @@ export default function NewEntryScreen() {
       text: trimmed,
       date: today,
       background: paperStyle,
+      textStyle,
       decorations: placedStickers,
     };
     await saveEntry(entry);
@@ -277,7 +295,21 @@ export default function NewEntryScreen() {
 
           <TextInput
             ref={textRef}
-            style={[styles.textInput, { minHeight: contentHeight, color: ink }]}
+            style={[
+              styles.textInput,
+              {
+                minHeight: contentHeight,
+                color: resolvedTextStyle.color,
+                fontFamily: resolvedTextStyle.fontFamily,
+                fontSize: resolvedTextStyle.fontSize,
+                lineHeight: resolvedTextStyle.lineHeight,
+                letterSpacing: resolvedTextStyle.letterSpacing,
+                textAlign: resolvedTextStyle.textAlign,
+                textTransform: resolvedTextStyle.textTransform,
+                textDecorationLine: resolvedTextStyle.textDecorationLine,
+                backgroundColor: resolvedTextStyle.backgroundColor,
+              },
+            ]}
             placeholder="Start writing..."
             placeholderTextColor={placeholderInk}
             multiline
@@ -301,7 +333,7 @@ export default function NewEntryScreen() {
         </JournalPage>
       </ScrollView>
 
-      {activeSticker && !isStickerPickerOpen && (
+      {activeSticker && !isStickerPickerOpen && !isFontPanelOpen && (
         <StickerToolbar
           onDuplicate={handleDuplicate}
           onBringToFront={handleBringToFront}
@@ -344,10 +376,24 @@ export default function NewEntryScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
+          style={[styles.toolButton, isFontPanelOpen && styles.toolButtonActive]}
+          activeOpacity={0.6}
+          onPress={() => {
+            setIsBgPickerOpen(false);
+            setIsStickerPickerOpen(false);
+            setIsFontPanelOpen((prev) => !prev);
+          }}
+        >
+          <TextIcon />
+          <Text style={[styles.toolLabel, isFontPanelOpen && styles.toolLabelActive]}>Text</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
           style={styles.toolButton}
           activeOpacity={0.6}
           onPress={() => {
             setIsBgPickerOpen(false);
+            setIsFontPanelOpen(false);
             setIsStickerPickerOpen(true);
           }}
         >
@@ -360,6 +406,7 @@ export default function NewEntryScreen() {
           activeOpacity={0.6}
           onPress={() => {
             setIsStickerPickerOpen(false);
+            setIsFontPanelOpen(false);
             setIsBgPickerOpen((prev) => !prev);
           }}
         >
@@ -393,6 +440,15 @@ export default function NewEntryScreen() {
         onSelect={(style) => setPaperStyle(style)}
         onClose={() => setIsBgPickerOpen(false)}
       />
+
+      {isFontPanelOpen && (
+        <FontPanel
+          visible={isFontPanelOpen}
+          style={textStyle}
+          onChange={(updates) => setTextStyle((prev) => ({ ...prev, ...updates }))}
+          onClose={() => setIsFontPanelOpen(false)}
+        />
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -429,7 +485,9 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: 'rgba(0,0,0,0.06)',
   },
   toolButton: { alignItems: 'center', gap: 4, paddingVertical: 6, paddingHorizontal: 12 },
+  toolButtonActive: { backgroundColor: 'rgba(183,196,168,0.25)', borderRadius: 12 },
   toolLabel: { fontFamily: fonts.ui, fontSize: 10, color: colors.textLight, letterSpacing: 0.5 },
+  toolLabelActive: { color: colors.sage, fontFamily: fonts.uiSemiBold },
   toolLabelDisabled: { opacity: 0.35 },
   saveButton: { alignItems: 'center', gap: 4, paddingVertical: 6, paddingHorizontal: 12 },
   saveButtonDisabled: { opacity: 0.35 },

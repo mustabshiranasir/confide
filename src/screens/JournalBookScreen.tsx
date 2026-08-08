@@ -21,15 +21,18 @@ import Animated, {
     useSharedValue,
 } from 'react-native-reanimated';
 import JournalPage, { getPaperInk, PaperStyle } from '../components/JournalPage';
-import { getStickerSource } from '../data/stickers';
+import GradientPageText from '../components/GradientPageText';
+import { useStickerSource } from '../components/Sticker/useStickerSource';
 import { deleteEntry, getAllEntries } from '../storage/journalStorage';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
+import { resolveTextStyle } from '../theme/fontStyles';
 import { PlacedSticker } from '../types/sticker';
+import { DEFAULT_TEXT_STYLE, isGradientColor, TextStyle } from '../types/textStyle';
 
 type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: { page: number; newEntry?: { id: string; text: string; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; background?: PaperStyle } };
+  JournalBook: { page: number; newEntry?: { id: string; text: string; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; background?: PaperStyle; textStyle?: TextStyle } };
   NewEntry: undefined;
 };
 
@@ -40,6 +43,7 @@ interface JournalEntry {
   stickers?: PlacedSticker[];
   decorations?: PlacedSticker[];
   background?: PaperStyle;
+  textStyle?: TextStyle;
 }
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -48,6 +52,7 @@ const MAX_PAGE_W = 460;
 const pageWidth = Math.min(SCREEN_W - 24, MAX_PAGE_W);
 const PAGE_H = Math.round(pageWidth * (4 / 3));
 const LIST_H = PAGE_H + 28;
+const CONTENT_W = pageWidth - 64;
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList<JournalEntry>);
 
 const EMPTY_PAGES: JournalEntry[] = Array.from({ length: 5 }).map((_, i) => ({
@@ -96,6 +101,9 @@ function PageFlipItem({
   });
 
   const placedStickers = item.decorations ?? item.stickers;
+  const textStyle = item.textStyle ?? DEFAULT_TEXT_STYLE;
+  const resolvedTextStyle = resolveTextStyle(textStyle, getPaperInk(item.background ?? 'custom'));
+  const isGradient = isGradientColor(textStyle.color);
 
   return (
     <View style={styles.pageWrapper}>
@@ -112,39 +120,46 @@ function PageFlipItem({
                 <View style={styles.tapeStrip} />
                 <Text style={styles.dateText}>{item.date}</Text>
                 <View style={styles.dateUnderline} />
-                <Text style={[styles.entryText, { color: getPaperInk(item.background ?? 'custom') }]}>{item.text}</Text>
+                {isGradient ? (
+                  <GradientPageText text={item.text} style={textStyle} width={CONTENT_W} />
+                ) : (
+                  <Text style={[styles.entryText, resolvedTextStyle]}>{item.text}</Text>
+                )}
               </>
             ) : null}
 
-            {placedStickers?.map((sticker) => {
-            const source = getStickerSource(sticker.stickerId);
-            if (!source) return null;
-            return (
-              <View
-                key={sticker.id}
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  width: 80,
-                  height: 80,
-                  opacity: sticker.opacity,
-                  transform: [
-                    { translateX: sticker.x },
-                    { translateY: sticker.y },
-                    { scaleX: sticker.scale * (sticker.widthScale ?? 1) },
-                    { scaleY: sticker.scale * (sticker.heightScale ?? 1) },
-                    { rotateZ: `${sticker.rotation}rad` },
-                  ],
-                }}
-              >
-                <Image source={source} style={{ width: 80, height: 80 }} resizeMode="contain" />
-              </View>
-            );
-          })}
-        </JournalPage>
+            {placedStickers?.map((sticker) => (
+              <PlacedStickerView key={sticker.id} sticker={sticker} />
+            ))}
+          </JournalPage>
         </Animated.View>
       </TouchableOpacity>
+    </View>
+  );
+}
+
+function PlacedStickerView({ sticker }: { sticker: PlacedSticker }) {
+  const { source, onError } = useStickerSource(sticker.stickerId);
+  if (!source) return null;
+  return (
+    <View
+      style={{
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        width: 80,
+        height: 80,
+        opacity: sticker.opacity,
+        transform: [
+          { translateX: sticker.x },
+          { translateY: sticker.y },
+          { scaleX: sticker.scale * (sticker.widthScale ?? 1) },
+          { scaleY: sticker.scale * (sticker.heightScale ?? 1) },
+          { rotateZ: `${sticker.rotation}rad` },
+        ],
+      }}
+    >
+      <Image source={source} style={{ width: 80, height: 80 }} resizeMode="contain" onError={onError} />
     </View>
   );
 }
@@ -324,7 +339,7 @@ const styles = StyleSheet.create({
   },
   dateText: { fontFamily: fonts.handwritten, fontSize: 22, color: colors.sage, marginBottom: 4 },
   dateUnderline: { width: 80, height: 1, backgroundColor: colors.accent, marginBottom: 16 },
-  entryText: { fontFamily: fonts.handwritten, fontSize: 24, color: colors.text, lineHeight: 36 },
+  entryText: {},
   folioBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 10, gap: 16 },
   folioDivider: { width: 32, height: 1, backgroundColor: 'rgba(74,74,74,0.15)' },
   folioSpacer: { width: 88 },

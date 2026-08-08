@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, useWindowDim
 import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { colors } from '../../theme/colors';
 import { fonts } from '../../theme/fonts';
-import { getCategories, getStickerById, getStickerSource } from '../../data/stickers';
+import { getCategories, getStickerById } from '../../data/stickers';
+import { useStickerSource } from './useStickerSource';
 import {
   getFavoriteIds,
   toggleFavorite,
@@ -21,6 +22,42 @@ const PANEL_HEIGHT = 300;
 const NUM_COLUMNS = 5;
 
 type TabKey = 'recents' | 'favorites' | string;
+
+function PickerCell({
+  item,
+  cellSize,
+  isFavorite,
+  onSelect,
+  onToggleFavorite,
+}: {
+  item: Sticker;
+  cellSize: number;
+  isFavorite: boolean;
+  onSelect: (sticker: Sticker) => void;
+  onToggleFavorite: (stickerId: string) => void;
+}) {
+  const { source, onError } = useStickerSource(item.id);
+  if (!source) return null;
+  return (
+    <TouchableOpacity
+      style={[styles.cell, { width: cellSize, height: cellSize }]}
+      activeOpacity={0.6}
+      onPress={() => onSelect(item)}
+    >
+      <Image source={source} style={styles.cellImage} resizeMode="contain" onError={onError} />
+      <TouchableOpacity
+        style={styles.heartButton}
+        activeOpacity={0.7}
+        onPress={() => onToggleFavorite(item.id)}
+        hitSlop={{ top: 6, right: 6, bottom: 6, left: 6 }}
+      >
+        <Text style={[styles.heart, isFavorite && styles.heartActive]}>
+          {isFavorite ? '♥' : '♡'}
+        </Text>
+      </TouchableOpacity>
+    </TouchableOpacity>
+  );
+}
 
 export default function StickerPicker({ onSelect, onClose }: StickerPickerProps) {
   const { width } = useWindowDimensions();
@@ -70,27 +107,14 @@ export default function StickerPicker({ onSelect, onClose }: StickerPickerProps)
   };
 
   const renderItem = ({ item }: { item: Sticker }) => {
-    const source = getStickerSource(item.id);
-    if (!source) return null;
-    const isFavorite = favoriteIds.includes(item.id);
     return (
-      <TouchableOpacity
-        style={[styles.cell, { width: cellSize, height: cellSize }]}
-        activeOpacity={0.6}
-        onPress={() => handleSelect(item)}
-      >
-        <Image source={source} style={styles.cellImage} resizeMode="contain" />
-        <TouchableOpacity
-          style={styles.heartButton}
-          activeOpacity={0.7}
-          onPress={() => handleToggleFavorite(item.id)}
-          hitSlop={{ top: 6, right: 6, bottom: 6, left: 6 }}
-        >
-          <Text style={[styles.heart, isFavorite && styles.heartActive]}>
-            {isFavorite ? '♥' : '♡'}
-          </Text>
-        </TouchableOpacity>
-      </TouchableOpacity>
+      <PickerCell
+        item={item}
+        cellSize={cellSize}
+        isFavorite={favoriteIds.includes(item.id)}
+        onSelect={handleSelect}
+        onToggleFavorite={handleToggleFavorite}
+      />
     );
   };
 

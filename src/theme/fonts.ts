@@ -1,5 +1,5 @@
 export const fonts = {
-  handwritten: 'Caveat-Regular',
-  ui: 'Inter-Regular',
-  uiSemiBold: 'Inter-SemiBold',
+  handwritten: 'Caveat_400Regular',
+  ui: 'Inter_400Regular',
+  uiSemiBold: 'Inter_600SemiBold',
 } as const;

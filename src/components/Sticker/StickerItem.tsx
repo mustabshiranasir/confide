@@ -8,7 +8,7 @@ import Animated, {
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { colors } from '../../theme/colors';
 import { fonts } from '../../theme/fonts';
-import { getStickerSource } from '../../data/stickers';
+import { useStickerSource } from './useStickerSource';
 import { PlacedSticker } from '../../types/sticker';
 
 export interface StickerItemProps {
@@ -48,7 +48,7 @@ export default function StickerItem({
   onUpdate,
   onDelete,
 }: StickerItemProps) {
-  const source = getStickerSource(sticker.stickerId);
+  const { source, onError } = useStickerSource(sticker.stickerId);
   const widthScale = sticker.widthScale ?? 1;
   const heightScale = sticker.heightScale ?? 1;
 
@@ -240,7 +240,7 @@ export default function StickerItem({
       >
         <GestureDetector gesture={composed}>
           <Animated.View style={[styles.inner, isActive && styles.innerActive]}>
-            <Image source={source} style={styles.image} resizeMode="contain" />
+            <Image source={source} style={styles.image} resizeMode="contain" onError={onError} />
           </Animated.View>
         </GestureDetector>
 

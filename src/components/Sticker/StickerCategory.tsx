@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react-native';
 import { colors } from '../../theme/colors';
 import { fonts } from '../../theme/fonts';
-import { getStickerSource } from '../../data/stickers';
+import { useStickerSource } from './useStickerSource';
 import { Sticker, StickerCategory as StickerCategoryType } from '../../types/sticker';
 
 export interface StickerCategoryProps {
@@ -12,25 +12,41 @@ export interface StickerCategoryProps {
 
 const NUM_COLUMNS = 5;
 
+function StickerCell({
+  item,
+  isSelected,
+  onSelect,
+}: {
+  item: Sticker;
+  isSelected: boolean;
+  onSelect: (sticker: Sticker) => void;
+}) {
+  const { source, onError } = useStickerSource(item.id);
+  if (!source) return null;
+  return (
+    <TouchableOpacity
+      style={[styles.cell, isSelected && styles.cellActive]}
+      activeOpacity={0.6}
+      onPress={() => onSelect(item)}
+    >
+      <Image source={source} style={styles.cellImage} resizeMode="contain" onError={onError} />
+    </TouchableOpacity>
+  );
+}
+
 export default function StickerCategory({ category, onSelect }: StickerCategoryProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const renderItem = ({ item }: { item: Sticker }) => {
-    const source = getStickerSource(item.id);
-    if (!source) return null;
-    return (
-      <TouchableOpacity
-        style={[styles.cell, selectedId === item.id && styles.cellActive]}
-        activeOpacity={0.6}
-        onPress={() => {
-          setSelectedId(item.id);
-          onSelect?.(item);
-        }}
-      >
-        <Image source={source} style={styles.cellImage} resizeMode="contain" />
-      </TouchableOpacity>
-    );
-  };
+  const renderItem = ({ item }: { item: Sticker }) => (
+    <StickerCell
+      item={item}
+      isSelected={selectedId === item.id}
+      onSelect={(sticker) => {
+        setSelectedId(sticker.id);
+        onSelect?.(sticker);
+      }}
+    />
+  );
 
   return (
     <View style={styles.container}>

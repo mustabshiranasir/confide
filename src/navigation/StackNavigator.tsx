@@ -7,10 +7,11 @@ import DebugStorageScreen from '../screens/DebugStorageScreen';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 import { PlacedSticker } from '../types/sticker';
+import { TextStyle } from '../types/textStyle';
 
 export type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: { page: number; newEntry?: { text: string; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[] } };
+  JournalBook: { page: number; newEntry?: { text: string; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; textStyle?: TextStyle } };
   NewEntry: undefined;
   DebugStorage: undefined;
 };
