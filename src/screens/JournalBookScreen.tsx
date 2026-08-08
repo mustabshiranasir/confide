@@ -28,11 +28,11 @@ import { deleteEntry, getAllEntries } from '../storage/journalStorage';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 import { PlacedSticker } from '../types/sticker';
-import { DEFAULT_TEXT_STYLE, isGradientColor, TextStyle, TextStyleRange } from '../types/textStyle';
+import { DEFAULT_TEXT_STYLE, DEFAULT_TITLE_STYLE, isGradientColor, TextStyle, TextStyleRange } from '../types/textStyle';
 
 type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: { page: number; newEntry?: { id: string; text: string; title?: string; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; background?: PaperStyle; textStyle?: TextStyle; ranges?: TextStyleRange[] } };
+  JournalBook: { page: number; newEntry?: { id: string; text: string; title?: string; titleStyle?: TextStyle; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; background?: PaperStyle; textStyle?: TextStyle; ranges?: TextStyleRange[] } };
   NewEntry: undefined;
 };
 
@@ -41,6 +41,7 @@ interface JournalEntry {
   date: string;
   text: string;
   title?: string;
+  titleStyle?: TextStyle;
   stickers?: PlacedSticker[];
   decorations?: PlacedSticker[];
   background?: PaperStyle;
@@ -119,7 +120,14 @@ function PageFlipItem({
             {item.text ? (
               <>
                 <View style={styles.tapeStrip} />
-                {item.title ? <Text style={styles.titleText}>{item.title}</Text> : null}
+                {item.title ? (
+                  <StyledEntryText
+                    text={item.title}
+                    baseStyle={item.titleStyle ?? DEFAULT_TITLE_STYLE}
+                    fallbackColor={getPaperInk(item.background ?? 'custom')}
+                    style={styles.titleText}
+                  />
+                ) : null}
                 <Text style={styles.dateText}>{item.date}</Text>
                 <View style={styles.dateUnderline} />
                 {isGradient && !(item.ranges && item.ranges.length > 0) ? (
@@ -347,10 +355,6 @@ const styles = StyleSheet.create({
   dateText: { fontFamily: fonts.handwritten, fontSize: 22, color: colors.sage, marginBottom: 4 },
   dateUnderline: { width: 80, height: 1, backgroundColor: colors.accent, marginBottom: 16 },
   titleText: {
-    fontFamily: fonts.handwritten,
-    fontSize: 34,
-    lineHeight: 40,
-    color: colors.text,
     marginBottom: 6,
   },
   folioBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 10, gap: 16 },

@@ -21,7 +21,7 @@ import StickerPicker from '../components/Sticker/StickerPicker';
 import StickerCanvas from '../components/Sticker/StickerCanvas';
 import StickerToolbar from '../components/Sticker/StickerToolbar';
 import { PlacedSticker, Sticker } from '../types/sticker';
-import { DEFAULT_TEXT_STYLE, TextStyle, TextStyleRange, applyStyleToSelection, rebaseRanges } from '../types/textStyle';
+import { DEFAULT_TEXT_STYLE, DEFAULT_TITLE_STYLE, TextStyle, TextStyleRange, applyStyleToSelection, rebaseRanges } from '../types/textStyle';
 import { resolveTextStyle } from '../theme/fontStyles';
 import { useStickerHistory } from '../hooks/useStickerHistory';
 import { saveEntry } from '../storage/journalStorage';
@@ -29,7 +29,7 @@ import StyledEntryText from '../components/StyledEntryText';
 
 type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: { page: number; newEntry?: { id: string; text: string; title?: string; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; background?: PaperStyle; textStyle?: TextStyle; ranges?: TextStyleRange[] } };
+  JournalBook: { page: number; newEntry?: { id: string; text: string; title?: string; titleStyle?: TextStyle; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; background?: PaperStyle; textStyle?: TextStyle; ranges?: TextStyleRange[] } };
   NewEntry: undefined;
 };
 
@@ -138,6 +138,8 @@ export default function NewEntryScreen() {
   const [isFontPanelOpen, setIsFontPanelOpen] = useState(false);
   const [paperStyle, setPaperStyle] = useState<PaperStyle>('white');
   const [textStyle, setTextStyle] = useState<TextStyle>(DEFAULT_TEXT_STYLE);
+  const [titleStyle, setTitleStyle] = useState<TextStyle>(DEFAULT_TITLE_STYLE);
+  const [activeField, setActiveField] = useState<'title' | 'body'>('title');
   const [ranges, setRanges] = useState<TextStyleRange[]>([]);
   const [selection, setSelection] = useState({ start: 0, end: 0 });
   const [activeStickerId, setActiveStickerId] = useState<string | null>(null);
@@ -161,7 +163,9 @@ export default function NewEntryScreen() {
   const ink = getPaperInk(paperStyle);
   const placeholderInk = ink === colors.text ? 'rgba(74, 74, 74, 0.25)' : `${ink}66`;
   const resolvedTextStyle = resolveTextStyle(textStyle, ink);
+  const resolvedTitleStyle = resolveTextStyle(titleStyle, ink);
   const selectionActive = selection.end > selection.start;
+  const panelStyle = activeField === 'title' ? titleStyle : textStyle;
 
   const activeSticker = placedStickers.find((s) => s.id === activeStickerId) ?? null;
   const activeIndex = activeSticker ? placedStickers.indexOf(activeSticker) : -1;
@@ -190,6 +194,10 @@ export default function NewEntryScreen() {
 
   const handleStyleChange = useCallback(
     (updates: Partial<TextStyle>) => {
+      if (activeField === 'title') {
+        setTitleStyle((prev) => ({ ...prev, ...updates }));
+        return;
+      }
       const start = Math.min(selection.start, selection.end);
       const end = Math.max(selection.start, selection.end);
       if (end > start) {
@@ -198,7 +206,7 @@ export default function NewEntryScreen() {
         setTextStyle((prev) => ({ ...prev, ...updates }));
       }
     },
-    [selection],
+    [activeField, selection],
   );
 
   const handleSave = async () => {
@@ -209,6 +217,7 @@ export default function NewEntryScreen() {
       id,
       text: trimmed,
       title: title.trim() || undefined,
+      titleStyle,
       date: today,
       background: paperStyle,
       textStyle,
@@ -326,11 +335,24 @@ export default function NewEntryScreen() {
           <View style={styles.tapeDecoration} />
 
           <TextInput
-            style={styles.titleInput}
+            style={[
+              styles.titleInput,
+              {
+                color: resolvedTitleStyle.color,
+                fontFamily: resolvedTitleStyle.fontFamily,
+                fontSize: resolvedTitleStyle.fontSize,
+                lineHeight: resolvedTitleStyle.lineHeight,
+                letterSpacing: resolvedTitleStyle.letterSpacing,
+                textAlign: resolvedTitleStyle.textAlign,
+                textTransform: resolvedTitleStyle.textTransform,
+                textDecorationLine: resolvedTitleStyle.textDecorationLine,
+              },
+            ]}
             placeholder="Entry title..."
             placeholderTextColor={placeholderInk}
             value={title}
             onChangeText={setTitle}
+            onFocus={() => setActiveField('title')}
             maxLength={60}
             returnKeyType="done"
             blurOnSubmit
@@ -382,6 +404,7 @@ export default function NewEntryScreen() {
               value={text}
               onChangeText={handleChangeText}
               onSelectionChange={handleSelectionChange}
+              onFocus={() => setActiveField('body')}
               onLayout={handleContentSizeChange}
               autoFocus
               blurOnSubmit={false}
@@ -511,8 +534,8 @@ export default function NewEntryScreen() {
       {isFontPanelOpen && (
         <FontPanel
           visible={isFontPanelOpen}
-          style={textStyle}
-          selectionActive={selectionActive}
+          style={panelStyle}
+          selectionActive={activeField === 'title' ? true : selectionActive}
           onChange={handleStyleChange}
           onClose={() => setIsFontPanelOpen(false)}
         />
@@ -543,12 +566,8 @@ const styles = StyleSheet.create({
   dateLabel: { fontFamily: fonts.handwritten, fontSize: 22, color: colors.sage, marginBottom: 4 },
   dateUnderline: { width: 80, height: 1, backgroundColor: colors.accent, marginBottom: 12 },
   titleInput: {
-    fontFamily: fonts.handwritten,
-    fontSize: 30,
-    lineHeight: 36,
     padding: 0,
     borderWidth: 0,
-    color: colors.text,
   },
   titleUnderline: {
     width: 160,

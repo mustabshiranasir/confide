@@ -12,7 +12,7 @@ import { TextStyle, TextStyleRange } from '../types/textStyle';
 
 export type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: { page: number; newEntry?: { id: string; text: string; title?: string; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; background?: PaperStyle; textStyle?: TextStyle; ranges?: TextStyleRange[] } };
+  JournalBook: { page: number; newEntry?: { id: string; text: string; title?: string; titleStyle?: TextStyle; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; background?: PaperStyle; textStyle?: TextStyle; ranges?: TextStyleRange[] } };
   NewEntry: undefined;
   DebugStorage: undefined;
 };

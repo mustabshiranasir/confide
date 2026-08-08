@@ -55,6 +55,12 @@ export const DEFAULT_TEXT_STYLE: TextStyle = {
   lineHeight: 1.5,
 };
 
+export const DEFAULT_TITLE_STYLE: TextStyle = {
+  ...DEFAULT_TEXT_STYLE,
+  fontSize: 30,
+  lineHeight: 1.2,
+};
+
 export interface TextStyleRange {
   start: number;
   length: number;
