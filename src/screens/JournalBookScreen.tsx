@@ -22,17 +22,17 @@ import Animated, {
 } from 'react-native-reanimated';
 import JournalPage, { getPaperInk, PaperStyle } from '../components/JournalPage';
 import GradientPageText from '../components/GradientPageText';
+import StyledEntryText from '../components/StyledEntryText';
 import { useStickerSource } from '../components/Sticker/useStickerSource';
 import { deleteEntry, getAllEntries } from '../storage/journalStorage';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
-import { resolveTextStyle } from '../theme/fontStyles';
 import { PlacedSticker } from '../types/sticker';
-import { DEFAULT_TEXT_STYLE, isGradientColor, TextStyle } from '../types/textStyle';
+import { DEFAULT_TEXT_STYLE, isGradientColor, TextStyle, TextStyleRange } from '../types/textStyle';
 
 type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: { page: number; newEntry?: { id: string; text: string; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; background?: PaperStyle; textStyle?: TextStyle } };
+  JournalBook: { page: number; newEntry?: { id: string; text: string; title?: string; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; background?: PaperStyle; textStyle?: TextStyle; ranges?: TextStyleRange[] } };
   NewEntry: undefined;
 };
 
@@ -40,10 +40,12 @@ interface JournalEntry {
   id: string;
   date: string;
   text: string;
+  title?: string;
   stickers?: PlacedSticker[];
   decorations?: PlacedSticker[];
   background?: PaperStyle;
   textStyle?: TextStyle;
+  ranges?: TextStyleRange[];
 }
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -102,7 +104,6 @@ function PageFlipItem({
 
   const placedStickers = item.decorations ?? item.stickers;
   const textStyle = item.textStyle ?? DEFAULT_TEXT_STYLE;
-  const resolvedTextStyle = resolveTextStyle(textStyle, getPaperInk(item.background ?? 'custom'));
   const isGradient = isGradientColor(textStyle.color);
 
   return (
@@ -118,12 +119,18 @@ function PageFlipItem({
             {item.text ? (
               <>
                 <View style={styles.tapeStrip} />
+                {item.title ? <Text style={styles.titleText}>{item.title}</Text> : null}
                 <Text style={styles.dateText}>{item.date}</Text>
                 <View style={styles.dateUnderline} />
-                {isGradient ? (
+                {isGradient && !(item.ranges && item.ranges.length > 0) ? (
                   <GradientPageText text={item.text} style={textStyle} width={CONTENT_W} />
                 ) : (
-                  <Text style={[styles.entryText, resolvedTextStyle]}>{item.text}</Text>
+                  <StyledEntryText
+                    text={item.text}
+                    ranges={item.ranges}
+                    baseStyle={textStyle}
+                    fallbackColor={getPaperInk(item.background ?? 'custom')}
+                  />
                 )}
               </>
             ) : null}
@@ -339,7 +346,13 @@ const styles = StyleSheet.create({
   },
   dateText: { fontFamily: fonts.handwritten, fontSize: 22, color: colors.sage, marginBottom: 4 },
   dateUnderline: { width: 80, height: 1, backgroundColor: colors.accent, marginBottom: 16 },
-  entryText: {},
+  titleText: {
+    fontFamily: fonts.handwritten,
+    fontSize: 34,
+    lineHeight: 40,
+    color: colors.text,
+    marginBottom: 6,
+  },
   folioBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 10, gap: 16 },
   folioDivider: { width: 32, height: 1, backgroundColor: 'rgba(74,74,74,0.15)' },
   folioSpacer: { width: 88 },

@@ -1,4 +1,37 @@
-import { FontCategory, TextStyle, solidColorValue } from '../types/textStyle';
+import { FontCategory, TextStyle, TextStyleRange, solidColorValue } from '../types/textStyle';
+
+export interface TextStyleSegment {
+  text: string;
+  style: TextStyle;
+}
+
+export function buildTextSegments(
+  text: string,
+  ranges: TextStyleRange[],
+  baseStyle: TextStyle,
+): TextStyleSegment[] {
+  if (!text) return [];
+  const sorted = [...ranges]
+    .filter((r) => r.length > 0 && r.start >= 0)
+    .sort((a, b) => a.start - b.start);
+  const segments: TextStyleSegment[] = [];
+  let cursor = 0;
+  for (const range of sorted) {
+    const start = range.start;
+    const end = Math.min(range.start + range.length, text.length);
+    if (start > cursor) {
+      segments.push({ text: text.slice(cursor, start), style: baseStyle });
+    }
+    if (end > cursor) {
+      segments.push({ text: text.slice(Math.max(start, cursor), end), style: range.style });
+    }
+    cursor = Math.max(cursor, end);
+  }
+  if (cursor < text.length) {
+    segments.push({ text: text.slice(cursor), style: baseStyle });
+  }
+  return segments;
+}
 
 export const DEFAULT_INK_COLOR = '#4A4A4A';
 

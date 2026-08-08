@@ -21,14 +21,15 @@ import StickerPicker from '../components/Sticker/StickerPicker';
 import StickerCanvas from '../components/Sticker/StickerCanvas';
 import StickerToolbar from '../components/Sticker/StickerToolbar';
 import { PlacedSticker, Sticker } from '../types/sticker';
-import { DEFAULT_TEXT_STYLE, TextStyle } from '../types/textStyle';
+import { DEFAULT_TEXT_STYLE, TextStyle, TextStyleRange, applyStyleToSelection, rebaseRanges } from '../types/textStyle';
 import { resolveTextStyle } from '../theme/fontStyles';
 import { useStickerHistory } from '../hooks/useStickerHistory';
 import { saveEntry } from '../storage/journalStorage';
+import StyledEntryText from '../components/StyledEntryText';
 
 type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: { page: number; newEntry?: { id: string; text: string; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; background?: PaperStyle; textStyle?: TextStyle } };
+  JournalBook: { page: number; newEntry?: { id: string; text: string; title?: string; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; background?: PaperStyle; textStyle?: TextStyle; ranges?: TextStyleRange[] } };
   NewEntry: undefined;
 };
 
@@ -130,12 +131,15 @@ function RedoIcon({ dimmed = false }: { dimmed?: boolean }) {
 export default function NewEntryScreen() {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [text, setText] = useState('');
+  const [title, setTitle] = useState('');
   const [contentHeight, setContentHeight] = useState(INITIAL_HEIGHT);
   const [isBgPickerOpen, setIsBgPickerOpen] = useState(false);
   const [isStickerPickerOpen, setIsStickerPickerOpen] = useState(false);
   const [isFontPanelOpen, setIsFontPanelOpen] = useState(false);
   const [paperStyle, setPaperStyle] = useState<PaperStyle>('white');
   const [textStyle, setTextStyle] = useState<TextStyle>(DEFAULT_TEXT_STYLE);
+  const [ranges, setRanges] = useState<TextStyleRange[]>([]);
+  const [selection, setSelection] = useState({ start: 0, end: 0 });
   const [activeStickerId, setActiveStickerId] = useState<string | null>(null);
   const textRef = useRef<TextInput>(null);
 
@@ -157,6 +161,7 @@ export default function NewEntryScreen() {
   const ink = getPaperInk(paperStyle);
   const placeholderInk = ink === colors.text ? 'rgba(74, 74, 74, 0.25)' : `${ink}66`;
   const resolvedTextStyle = resolveTextStyle(textStyle, ink);
+  const selectionActive = selection.end > selection.start;
 
   const activeSticker = placedStickers.find((s) => s.id === activeStickerId) ?? null;
   const activeIndex = activeSticker ? placedStickers.indexOf(activeSticker) : -1;
@@ -168,6 +173,34 @@ export default function NewEntryScreen() {
     [],
   );
 
+  const handleSelectionChange = useCallback(
+    (e: { nativeEvent: { selection: { start: number; end: number } } }) => {
+      setSelection(e.nativeEvent.selection);
+    },
+    [],
+  );
+
+  const handleChangeText = useCallback(
+    (newText: string) => {
+      setRanges((prev) => rebaseRanges(prev, text, newText));
+      setText(newText);
+    },
+    [text],
+  );
+
+  const handleStyleChange = useCallback(
+    (updates: Partial<TextStyle>) => {
+      const start = Math.min(selection.start, selection.end);
+      const end = Math.max(selection.start, selection.end);
+      if (end > start) {
+        setRanges((prev) => applyStyleToSelection(prev, start, end - start, updates));
+      } else {
+        setTextStyle((prev) => ({ ...prev, ...updates }));
+      }
+    },
+    [selection],
+  );
+
   const handleSave = async () => {
     const trimmed = text.trim();
     if (!trimmed && placedStickers.length === 0) return;
@@ -175,9 +208,11 @@ export default function NewEntryScreen() {
     const entry = {
       id,
       text: trimmed,
+      title: title.trim() || undefined,
       date: today,
       background: paperStyle,
       textStyle,
+      ranges,
       decorations: placedStickers,
     };
     await saveEntry(entry);
@@ -290,38 +325,70 @@ export default function NewEntryScreen() {
         <JournalPage background={paperStyle} contentPadding style={styles.page}>
           <View style={styles.tapeDecoration} />
 
+          <TextInput
+            style={styles.titleInput}
+            placeholder="Entry title..."
+            placeholderTextColor={placeholderInk}
+            value={title}
+            onChangeText={setTitle}
+            maxLength={60}
+            returnKeyType="done"
+            blurOnSubmit
+          />
+          <View style={styles.titleUnderline} />
+
           <Text style={styles.dateLabel}>{today}</Text>
           <View style={styles.dateUnderline} />
 
-          <TextInput
-            ref={textRef}
-            style={[
-              styles.textInput,
-              {
-                minHeight: contentHeight,
-                color: resolvedTextStyle.color,
-                fontFamily: resolvedTextStyle.fontFamily,
-                fontSize: resolvedTextStyle.fontSize,
-                lineHeight: resolvedTextStyle.lineHeight,
-                letterSpacing: resolvedTextStyle.letterSpacing,
-                textAlign: resolvedTextStyle.textAlign,
-                textTransform: resolvedTextStyle.textTransform,
-                textDecorationLine: resolvedTextStyle.textDecorationLine,
-                backgroundColor: resolvedTextStyle.backgroundColor,
-              },
-            ]}
-            placeholder="Start writing..."
-            placeholderTextColor={placeholderInk}
-            multiline
-            textAlignVertical="top"
-            value={text}
-            onChangeText={setText}
-            onLayout={handleContentSizeChange}
-            autoFocus
-            blurOnSubmit={false}
-            selectionColor={colors.accent}
-            scrollEnabled={false}
-          />
+          <View style={styles.bodyWrapper}>
+            <StyledEntryText
+              text={text}
+              ranges={ranges}
+              baseStyle={textStyle}
+              fallbackColor={ink}
+              style={[
+                styles.textInput,
+                styles.previewOverlay,
+                {
+                  color: resolvedTextStyle.color,
+                  fontFamily: resolvedTextStyle.fontFamily,
+                  fontSize: resolvedTextStyle.fontSize,
+                  lineHeight: resolvedTextStyle.lineHeight,
+                  letterSpacing: resolvedTextStyle.letterSpacing,
+                  textAlign: resolvedTextStyle.textAlign,
+                  textTransform: resolvedTextStyle.textTransform,
+                },
+              ]}
+            />
+            <TextInput
+              ref={textRef}
+              style={[
+                styles.textInput,
+                {
+                  minHeight: contentHeight,
+                  color: 'transparent',
+                  fontFamily: resolvedTextStyle.fontFamily,
+                  fontSize: resolvedTextStyle.fontSize,
+                  lineHeight: resolvedTextStyle.lineHeight,
+                  letterSpacing: resolvedTextStyle.letterSpacing,
+                  textAlign: resolvedTextStyle.textAlign,
+                  textTransform: resolvedTextStyle.textTransform,
+                },
+              ]}
+              placeholder="Start writing..."
+              placeholderTextColor={placeholderInk}
+              multiline
+              textAlignVertical="top"
+              value={text}
+              onChangeText={handleChangeText}
+              onSelectionChange={handleSelectionChange}
+              onLayout={handleContentSizeChange}
+              autoFocus
+              blurOnSubmit={false}
+              selectionColor={colors.accent}
+              scrollEnabled={false}
+            />
+          </View>
 
           <StickerCanvas
             stickers={placedStickers}
@@ -445,7 +512,8 @@ export default function NewEntryScreen() {
         <FontPanel
           visible={isFontPanelOpen}
           style={textStyle}
-          onChange={(updates) => setTextStyle((prev) => ({ ...prev, ...updates }))}
+          selectionActive={selectionActive}
+          onChange={handleStyleChange}
           onClose={() => setIsFontPanelOpen(false)}
         />
       )}
@@ -474,6 +542,24 @@ const styles = StyleSheet.create({
   },
   dateLabel: { fontFamily: fonts.handwritten, fontSize: 22, color: colors.sage, marginBottom: 4 },
   dateUnderline: { width: 80, height: 1, backgroundColor: colors.accent, marginBottom: 12 },
+  titleInput: {
+    fontFamily: fonts.handwritten,
+    fontSize: 30,
+    lineHeight: 36,
+    padding: 0,
+    borderWidth: 0,
+    color: colors.text,
+  },
+  titleUnderline: {
+    width: 160,
+    height: 1.5,
+    backgroundColor: colors.sage,
+    marginTop: 6,
+    marginBottom: 14,
+    opacity: 0.6,
+  },
+  bodyWrapper: { position: 'relative', minHeight: 80 },
+  previewOverlay: { position: 'absolute', top: 0, left: 0, right: 0 },
   textInput: {
     fontFamily: fonts.handwritten, fontSize: 22,
     lineHeight: 34, padding: 0, borderWidth: 0,

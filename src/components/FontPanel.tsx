@@ -35,13 +35,14 @@ interface FontPanelProps {
   style: TextStyle;
   onChange: (updates: Partial<TextStyle>) => void;
   onClose: () => void;
+  selectionActive?: boolean;
 }
 
 type CategoryFilter = 'all' | keyof typeof FONT_CATEGORY_LABELS;
 
 const SLIDER_THUMB = 20;
 
-export default function FontPanel({ visible, style, onChange, onClose }: FontPanelProps) {
+export default function FontPanel({ visible, style, onChange, onClose, selectionActive = false }: FontPanelProps) {
   const { height: windowHeight } = useWindowDimensions();
   const panelHeight = Math.min(Math.round(windowHeight * 0.62), 480);
 
@@ -57,6 +58,13 @@ export default function FontPanel({ visible, style, onChange, onClose }: FontPan
         <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
           <Text style={styles.doneText}>Done</Text>
         </TouchableOpacity>
+      </View>
+
+      <View style={[styles.selectionBanner, selectionActive && styles.selectionBannerActive]}>
+        <View style={[styles.selectionDot, selectionActive && styles.selectionDotActive]} />
+        <Text style={[styles.selectionText, selectionActive && styles.selectionTextActive]}>
+          {selectionActive ? 'Applies to selected text' : 'Select text to style a chunk'}
+        </Text>
       </View>
 
       <ScrollView
@@ -511,6 +519,27 @@ const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 24 },
   title: { fontFamily: fonts.uiSemiBold, fontSize: 14, color: colors.text },
   doneText: { fontFamily: fonts.ui, fontSize: 13, color: colors.accent },
+
+  selectionBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 10,
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    backgroundColor: colors.base,
+  },
+  selectionBannerActive: { backgroundColor: 'rgba(183,196,168,0.25)' },
+  selectionDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(74,74,74,0.25)',
+  },
+  selectionDotActive: { backgroundColor: colors.sage },
+  selectionText: { fontFamily: fonts.ui, fontSize: 11, color: colors.textLight },
+  selectionTextActive: { color: colors.sage, fontFamily: fonts.uiSemiBold },
 
   section: { marginBottom: 18 },
   sectionLabel: {

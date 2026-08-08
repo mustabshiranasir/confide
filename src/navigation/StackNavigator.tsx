@@ -6,12 +6,13 @@ import NewEntryScreen from '../screens/NewEntryScreen';
 import DebugStorageScreen from '../screens/DebugStorageScreen';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
+import { PaperStyle } from '../components/JournalPage';
 import { PlacedSticker } from '../types/sticker';
-import { TextStyle } from '../types/textStyle';
+import { TextStyle, TextStyleRange } from '../types/textStyle';
 
 export type RootStackParamList = {
   BookShelf: undefined;
-  JournalBook: { page: number; newEntry?: { text: string; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; textStyle?: TextStyle } };
+  JournalBook: { page: number; newEntry?: { id: string; text: string; title?: string; date: string; stickers?: PlacedSticker[]; decorations?: PlacedSticker[]; background?: PaperStyle; textStyle?: TextStyle; ranges?: TextStyleRange[] } };
   NewEntry: undefined;
   DebugStorage: undefined;
 };
